@@ -65,7 +65,7 @@ void tokenize_string(char *string, char *array[6]) {
 }
 
 
-void insert_records(FILE *fp, Node **root_ptr) {
+void insert_records(FILE *fp, RedBlackTree *RBT) {
     int lines_count = 0;
     char *line = NULL;
     size_t len = 0;
@@ -79,7 +79,7 @@ void insert_records(FILE *fp, Node **root_ptr) {
 
         tokenize_string(line, tokens);
 
-        rbt_insert(root_ptr, tokens[0]);
+        rbt_insert(RBT, tokens[0]);
 
         // printf("Key: %s\n", tokens[0]);
         // printf("Name: %s\n", tokens[1]);

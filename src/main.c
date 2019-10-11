@@ -12,7 +12,7 @@ int main(int argc, char *argv[]) {
     FILE *infile;
 
     BloomFilter BF;
-    Node *bf_root = NULL;
+    RedBlackTree RBT;
 
     // Open input file
     infile = fopen(argv[2], "r");
@@ -33,13 +33,13 @@ int main(int argc, char *argv[]) {
     bloom_print(BF);
 
     // Insert records to red-black tree
-    insert_records(infile, &bf_root);
-    // rbt_print(bf_root);
+    insert_records(infile, &RBT);
+    // rbt_print(RBT);
 
     // Close file and free allocated memory
     fclose(infile);
 
-    rbt_free(bf_root);
+    rbt_free(RBT);
     bloom_free(BF);
 
     return 0;

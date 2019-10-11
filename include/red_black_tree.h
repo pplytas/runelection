@@ -11,18 +11,19 @@ struct Node {
     Node *parent;
 };
 
+typedef struct RedBlackTree {
+    int count;
+    Node *root;
+} RedBlackTree;
+
 Node* create_node(char *);
-
-void rbt_rotate_left(Node **, Node *);
-void rbt_rotate_right(Node **, Node *);
-void rbt_check_fix(Node **, Node *);
-
-void rbt_insert(Node **, char *);
-
-int rbt_height(Node *);
-int rbt_black_height(Node *);
-void rbt_print(Node *);
-
-void rbt_free(Node *);
+void rbt_rotate_left(RedBlackTree *, Node *);
+void rbt_rotate_right(RedBlackTree *, Node *);
+void rbt_check_fix(RedBlackTree *, Node *);
+void rbt_insert(RedBlackTree *, char *);
+void rbt_print_node(Node *);
+void rbt_print(RedBlackTree);
+void rbt_free_node(Node *);
+void rbt_free(RedBlackTree);
 
 #endif
