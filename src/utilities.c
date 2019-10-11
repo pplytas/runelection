@@ -65,12 +65,13 @@ void tokenize_string(char *string, char *array[6]) {
 }
 
 
-void insert_records(FILE *fp, BloomFilter *BF, RedBlackTree *RBT) {
+void insert_records(BloomFilter *BF, RedBlackTree *RBT, VoterList *VL, FILE *fp) {
     int lines_count = 0;
     char *line = NULL;
     size_t len = 0;
     ssize_t line_length;
     char *tokens[6];
+    RedBlackNode *new_node;
 
     while ((line_length = getline(&line, &len, fp)) != -1) {
         if (line[line_length - 1] == '\n') {
@@ -80,7 +81,8 @@ void insert_records(FILE *fp, BloomFilter *BF, RedBlackTree *RBT) {
         tokenize_string(line, tokens);
 
         bloom_add(BF, &tokens[0], strlen(tokens[0]) + 1);
-        rbt_insert(RBT, tokens[0]);
+        new_node = rbt_insert(RBT, tokens[0]);
+        vl_insert(VL, new_node);
 
         // printf("Key: %s\n", tokens[0]);
         // printf("Name: %s\n", tokens[1]);

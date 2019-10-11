@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <red_black_tree.h>
+#include "red_black_tree.h"
 
 #define RED 'R'
 #define BLACK 'B'
@@ -15,8 +15,8 @@ void rbt_init(RedBlackTree *RBT) {
 }
 
 
-Node* create_node(char *key) {
-    Node *new_node = (Node*) malloc(sizeof(Node));
+RedBlackNode* create_red_black_node(char *key) {
+    RedBlackNode *new_node = (RedBlackNode*) malloc(sizeof(RedBlackNode));
 
     strcpy(new_node->key, key);
     new_node->color = RED;
@@ -28,8 +28,8 @@ Node* create_node(char *key) {
 }
 
 
-void rbt_rotate_left(RedBlackTree *RBT, Node *pivot_node) {
-    Node *pivot_right_child = pivot_node->right;    // set pivot_right_child
+void rbt_rotate_left(RedBlackTree *RBT, RedBlackNode *pivot_node) {
+    RedBlackNode *pivot_right_child = pivot_node->right;    // set pivot_right_child
     pivot_node->right = pivot_right_child->left;     // turn pivot_right_child's left subtree into pivot_node's right subtree{
     if (pivot_right_child->left != NULL) {
         pivot_right_child->left->parent = pivot_node;
@@ -47,8 +47,8 @@ void rbt_rotate_left(RedBlackTree *RBT, Node *pivot_node) {
 }
 
 
-void rbt_rotate_right(RedBlackTree *RBT, Node *pivot_node) {
-    Node *pivot_left_child = pivot_node->left;     // set pivot_left_child
+void rbt_rotate_right(RedBlackTree *RBT, RedBlackNode *pivot_node) {
+    RedBlackNode *pivot_left_child = pivot_node->left;     // set pivot_left_child
     pivot_node->left = pivot_left_child->right;    // turn pivot_left_child's right subtree into pivot_node's left subtree
     if (pivot_left_child->right != NULL) {
         pivot_left_child->right->parent = pivot_node;
@@ -66,8 +66,8 @@ void rbt_rotate_right(RedBlackTree *RBT, Node *pivot_node) {
 }
 
 
-void rbt_check_fix(RedBlackTree *RBT, Node *new_node) {
-    Node *temp_node;
+void rbt_check_fix(RedBlackTree *RBT, RedBlackNode *new_node) {
+    RedBlackNode *temp_node;
 
     while (new_node->parent != NULL && new_node->parent->color == RED) {
         if (new_node->parent == new_node->parent->parent->left) {   // Parent of new node is a left child itself
@@ -109,8 +109,8 @@ void rbt_check_fix(RedBlackTree *RBT, Node *new_node) {
 }
 
 
-void rbt_insert(RedBlackTree *RBT, char *key) {
-    Node *parent_node, *tmp_node, *new_node;
+RedBlackNode* rbt_insert(RedBlackTree *RBT, char *key) {
+    RedBlackNode *parent_node, *tmp_node, *new_node;
 
     // Find where to insert new key
     tmp_node = RBT->root;
@@ -125,7 +125,7 @@ void rbt_insert(RedBlackTree *RBT, char *key) {
     }
 
     // Create new node with given key
-    new_node = create_node(key);
+    new_node = create_red_black_node(key);
 
     // Insert new node in tree
     if (parent_node != NULL) {
@@ -142,10 +142,12 @@ void rbt_insert(RedBlackTree *RBT, char *key) {
 
     // Ensure the Red-Black property is maintained
     rbt_check_fix(RBT, new_node);
+
+    return new_node;
 }
 
 
-void rbt_print_node(Node *node) {
+void rbt_print_node(RedBlackNode *node) {
     if (node != NULL && (node->left != NULL || node->right != NULL)) {
         printf("        %s(%c)\n", node->key, (node->color == BLACK ? BLACK : RED));
         printf("       _____|_____\n");
@@ -171,7 +173,7 @@ void rbt_print(RedBlackTree RBT) {
     rbt_print_node(RBT.root);
 }
 
-void rbt_free_node(Node *node) {
+void rbt_free_node(RedBlackNode *node) {
     if (node == NULL) return;
 
     // Free children

@@ -1,12 +1,6 @@
 #ifndef BLOOM_FILTER_H
 #define BLOOM_FILTER_H
 
-/** ***************************************************************************
- * Structure to keep track of one bloom filter.  Caller needs to
- * allocate this and pass it to the functions below. First call for
- * every struct must be to bloom_init().
- *
- */
 typedef struct BloomFilter {
     int count;
     int bits;

@@ -3,8 +3,6 @@
 #include <string.h>
 
 #include "utilities.h"
-#include "bloom_filter.h"
-#include "red_black_tree.h"
 
 
 int main(int argc, char *argv[]) {
@@ -13,6 +11,7 @@ int main(int argc, char *argv[]) {
 
     BloomFilter BF;
     RedBlackTree RBT;
+    VoterList VL;
 
     // Open input file
     infile = fopen(argv[2], "r");
@@ -31,9 +30,10 @@ int main(int argc, char *argv[]) {
     // Init data structures
     bloom_init(&BF, bf_size);
     rbt_init(&RBT);
+    vl_init(&VL);
 
     // Insert records to data structures
-    insert_records(infile, &BF, &RBT);
+    insert_records(&BF, &RBT, &VL, infile);
 
     // Close file
     fclose(infile);
