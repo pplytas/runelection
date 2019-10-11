@@ -1,0 +1,26 @@
+CC=gcc
+
+IDIR =../include
+ODIR=./obj
+
+CFLAGS=-I $(IDIR)
+LIBS=-lm
+
+_DEPS = utilities.h bloom_filter.h murmurhash2.h red_black_tree.h
+DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
+
+_OBJ = main.o utilities.o bloom_filter.o murmurhash2.o red_black_tree.o
+OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
+
+
+$(ODIR)/%.o: %.c $(DEPS)
+	$(CC) -c -o $@ $< $(CFLAGS)
+
+main: $(OBJ)
+	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
+	@echo "Executable file created. Run with ./main";
+
+.PHONY: clean
+
+clean:
+	rm -f $(ODIR)/*.o *~ core $(INCDIR)/*~
