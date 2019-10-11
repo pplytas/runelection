@@ -41,8 +41,10 @@ int main(int argc, char *argv[]) {
     // Print data structures
     bloom_print(BF);
     // rbt_print(RBT);
+    vl_print(VL);
 
     // Free allocated memory of data structures
+    vl_free(VL);
     rbt_free(RBT);
     bloom_free(BF);
 
