@@ -13,12 +13,15 @@ _OBJ = main.o utilities.o bloom_filter.o murmurhash2.o red_black_tree.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 
-$(ODIR)/%.o: %.c $(DEPS)
+$(ODIR)/%.o: %.c $(DEPS) | $(ODIR)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 main: $(OBJ)
 	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
 	@echo "Executable file created. Run with ./main";
+
+$(ODIR):
+	mkdir -p $@
 
 .PHONY: clean
 

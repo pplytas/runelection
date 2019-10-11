@@ -7,17 +7,17 @@
 #include "murmurhash2.h"
 
 
-int bloom_init(BloomFilter *bloom, int size) {
-    bloom->bits = size;
+int bloom_init(BloomFilter *BF, int size) {
+    BF->bits = size;
 
-    if (bloom->bits % 8) {
-        bloom->bytes = (bloom->bits / 8) + 1;
+    if (BF->bits % 8) {
+        BF->bytes = (BF->bits / 8) + 1;
     } else {
-        bloom->bytes = bloom->bits / 8;
+        BF->bytes = BF->bits / 8;
     }
 
-    bloom->bf = (unsigned char *) calloc(bloom->bytes, sizeof(unsigned char));
-    if (bloom->bf == NULL) {
+    BF->bf = (unsigned char *) calloc(BF->bytes, sizeof(unsigned char));
+    if (BF->bf == NULL) {
         return 1;
     }
 
@@ -52,15 +52,15 @@ int set_bit(unsigned char *buf, unsigned int x) {
 }
 
 
-int bloom_check(BloomFilter *bloom, const void *buffer, int len) {
+int bloom_check(BloomFilter *BF, const void *buffer, int len) {
     int i;
     unsigned int a = murmurhash2(buffer, len, 0x9747b28c);
     unsigned int b = murmurhash2(buffer, len, a);
     unsigned int hash_bits;
 
     for (i = 0; i < 3; i++) {
-        hash_bits = (a + i * b) % bloom->bits;
-        if (!test_bit(bloom->bf, hash_bits)) {
+        hash_bits = (a + i * b) % BF->bits;
+        if (!test_bit(BF->bf, hash_bits)) {
             return 0;
         }
     }
@@ -68,7 +68,7 @@ int bloom_check(BloomFilter *bloom, const void *buffer, int len) {
 }
 
 
-int bloom_add(BloomFilter *bloom, const void *buffer, int len) {
+int bloom_add(BloomFilter *BF, const void *buffer, int len) {
     int i;
     int hits = 0;
     unsigned int a = murmurhash2(buffer, len, 0x9747b28c);
@@ -76,8 +76,8 @@ int bloom_add(BloomFilter *bloom, const void *buffer, int len) {
     unsigned int hash_bits;
 
     for (i = 0; i < 3; i++) {
-        hash_bits = (a + i * b) % bloom->bits;
-        if (set_bit(bloom->bf, hash_bits)) {
+        hash_bits = (a + i * b) % BF->bits;
+        if (set_bit(BF->bf, hash_bits)) {
             hits++;
         }
     }
@@ -89,22 +89,21 @@ int bloom_add(BloomFilter *bloom, const void *buffer, int len) {
     return 0;
 }
 
-void bloom_print(BloomFilter *bloom) {
-    printf("bloom at %p\n", (void * ) bloom);
-    printf(" ->bits = %d\n", bloom->bits);
-    printf(" ->bytes = %d\n", bloom->bytes);
+void bloom_print(BloomFilter BF) {
+    printf("Bloom Filter\n");
+    printf("\tbits = %d\n", BF.bits);
+    printf("\tbytes = %d\n", BF.bytes);
 }
 
 
-void bloom_free(BloomFilter *bloom) {
-    if (bloom != NULL) {
-        free(bloom->bf);
-        free(bloom);
+void bloom_free(BloomFilter BF) {
+    if (BF.bf != NULL) {
+        free(BF.bf);
     }
 }
 
 
-int bloom_reset(BloomFilter *bloom) {
-    memset(bloom->bf, 0, bloom->bytes);
+int bloom_reset(BloomFilter *BF) {
+    memset(BF->bf, 0, BF->bytes);
     return 0;
 }
