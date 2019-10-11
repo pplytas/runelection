@@ -65,7 +65,7 @@ void tokenize_string(char *string, char *array[6]) {
 }
 
 
-void insert_records(FILE *fp, RedBlackTree *RBT) {
+void insert_records(FILE *fp, BloomFilter *BF, RedBlackTree *RBT) {
     int lines_count = 0;
     char *line = NULL;
     size_t len = 0;
@@ -79,6 +79,7 @@ void insert_records(FILE *fp, RedBlackTree *RBT) {
 
         tokenize_string(line, tokens);
 
+        bloom_add(BF, &tokens[0], strlen(tokens[0]) + 1);
         rbt_insert(RBT, tokens[0]);
 
         // printf("Key: %s\n", tokens[0]);

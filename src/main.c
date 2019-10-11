@@ -32,14 +32,17 @@ int main(int argc, char *argv[]) {
     bloom_init(&BF, bf_size);
     rbt_init(&RBT);
 
-    // Insert records to red-black tree
-    insert_records(infile, &RBT);
-    // bloom_print(BF);
-    // rbt_print(RBT);
+    // Insert records to data structures
+    insert_records(infile, &BF, &RBT);
 
-    // Close file and free allocated memory
+    // Close file
     fclose(infile);
 
+    // Print data structures
+    bloom_print(BF);
+    // rbt_print(RBT);
+
+    // Free allocated memory of data structures
     rbt_free(RBT);
     bloom_free(BF);
 
