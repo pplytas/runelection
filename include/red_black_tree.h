@@ -12,10 +12,11 @@ struct Node {
 };
 
 typedef struct RedBlackTree {
-    int count;
     Node *root;
+    int count;
 } RedBlackTree;
 
+void rbt_init(RedBlackTree *);
 Node* create_node(char *);
 void rbt_rotate_left(RedBlackTree *, Node *);
 void rbt_rotate_right(RedBlackTree *, Node *);

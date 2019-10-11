@@ -25,15 +25,16 @@ int main(int argc, char *argv[]) {
     lines_count = get_lines_count(infile);
     printf("Number of lines: %d\n", lines_count);
 
-    // Find optimal number of bits for bloom filter
+    // Find optimal number of bits for Bloom Filter
     bf_size = get_prime_number(lines_count * 3);
 
-    // Create bloom filter
+    // Init data structures
     bloom_init(&BF, bf_size);
-    bloom_print(BF);
+    rbt_init(&RBT);
 
     // Insert records to red-black tree
     insert_records(infile, &RBT);
+    // bloom_print(BF);
     // rbt_print(RBT);
 
     // Close file and free allocated memory

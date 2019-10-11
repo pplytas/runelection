@@ -9,6 +9,12 @@
 #define MAX(a,b) (((a)>(b))?(a):(b))
 
 
+void rbt_init(RedBlackTree *RBT) {
+    RBT->root = NULL;
+    RBT->count = 0;
+}
+
+
 Node* create_node(char *key) {
     Node *new_node = (Node*) malloc(sizeof(Node));
 
