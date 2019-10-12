@@ -6,10 +6,10 @@ ODIR=./obj
 CFLAGS=-I $(IDIR)
 LIBS=-lm
 
-_DEPS = utilities.h bloom_filter.h murmurhash2.h red_black_tree.h voter_list.h
+_DEPS = utilities.h bloom_filter.h murmurhash2.h red_black_tree.h postcode_list.h voter_list.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 
-_OBJ = main.o utilities.o bloom_filter.o murmurhash2.o red_black_tree.o voter_list.o
+_OBJ = main.o utilities.o bloom_filter.o murmurhash2.o red_black_tree.o postcode_list.o voter_list.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 

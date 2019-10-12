@@ -11,7 +11,7 @@ int main(int argc, char *argv[]) {
 
     BloomFilter BF;
     RedBlackTree RBT;
-    VoterList VL;
+    PostCodeList PCL;
 
     // Open input file
     infile = fopen(argv[2], "r");
@@ -30,10 +30,10 @@ int main(int argc, char *argv[]) {
     // Init data structures
     bloom_init(&BF, bf_size);
     rbt_init(&RBT);
-    vl_init(&VL);
+    pcl_init(&PCL);
 
     // Insert records to data structures
-    insert_records(&BF, &RBT, &VL, infile);
+    insert_records(&BF, &RBT, &PCL, infile);
 
     // Close file
     fclose(infile);
@@ -41,10 +41,10 @@ int main(int argc, char *argv[]) {
     // Print data structures
     bloom_print(BF);
     // rbt_print(RBT);
-    vl_print(VL);
+    pcl_print(PCL);
 
     // Free allocated memory of data structures
-    vl_free(VL);
+    pcl_free(PCL);
     rbt_free(RBT);
     bloom_free(BF);
 

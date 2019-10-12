@@ -17,6 +17,7 @@ typedef struct VoterList {
 
 void vl_init(VoterList *);
 VoterNode* create_voter_node(RedBlackNode *);
+VoterNode* vl_find_node_by_key(VoterList, char[9]);
 void vl_insert(VoterList *, RedBlackNode *);
 void vl_remove(VoterList *, char[9]);
 void vl_print(VoterList);

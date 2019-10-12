@@ -93,7 +93,7 @@ void bloom_print(BloomFilter BF) {
     printf("Bloom Filter\n");
     printf("\tcount = %d\n", BF.count);
     printf("\tbits = %d\n", BF.bits);
-    printf("\tbytes = %d\n", BF.bytes);
+    printf("\tbytes = %d\n\n", BF.bytes);
 }
 
 

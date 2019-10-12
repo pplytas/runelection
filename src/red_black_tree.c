@@ -15,10 +15,12 @@ void rbt_init(RedBlackTree *RBT) {
 }
 
 
-RedBlackNode* create_red_black_node(char *key) {
+RedBlackNode* create_red_black_node(char key[9], char postcode[6]) {
     RedBlackNode *new_node = (RedBlackNode*) malloc(sizeof(RedBlackNode));
 
     strcpy(new_node->key, key);
+    strcpy(new_node->postcode, postcode);
+
     new_node->color = RED;
     new_node->left = NULL;
     new_node->right = NULL;
@@ -109,7 +111,7 @@ void rbt_check_fix(RedBlackTree *RBT, RedBlackNode *new_node) {
 }
 
 
-RedBlackNode* rbt_insert(RedBlackTree *RBT, char *key) {
+RedBlackNode* rbt_insert(RedBlackTree *RBT, char key[9], char postcode[6]) {
     RedBlackNode *parent_node, *tmp_node, *new_node;
 
     // Find where to insert new key
@@ -125,7 +127,7 @@ RedBlackNode* rbt_insert(RedBlackTree *RBT, char *key) {
     }
 
     // Create new node with given key
-    new_node = create_red_black_node(key);
+    new_node = create_red_black_node(key, postcode);
 
     // Insert new node in tree
     if (parent_node != NULL) {

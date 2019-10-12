@@ -19,6 +19,17 @@ VoterNode* create_voter_node(RedBlackNode *voter) {
 }
 
 
+VoterNode* vl_find_node_by_key(VoterList VL, char key[9]) {
+    VoterNode *tmp_node = VL.head;
+
+    while (tmp_node != NULL && strcmp(tmp_node->voter->key, key) != 0) {
+        tmp_node = tmp_node->next;
+    }
+
+    return tmp_node;
+}
+
+
 void vl_insert(VoterList *VL, RedBlackNode *voter) {
     VoterNode *new_voter_node = create_voter_node(voter);
 
@@ -37,13 +48,15 @@ void vl_remove(VoterList *VL, char key[9]) {
     VoterNode *node_to_delete = VL->head;
     VoterNode *previous_node = NULL;
 
+    if (node_to_delete == NULL) return;
+
     while (strcmp(node_to_delete->voter->key, key) != 0) {
         previous_node = node_to_delete;
         node_to_delete = node_to_delete->next;
     }
 
     if (previous_node == NULL) {        // Node to be deleted is the head
-        VL->head = NULL;
+        VL->head = node_to_delete->next;;
     } else {                            // Node to be deleted is NOT the head
         previous_node->next = node_to_delete->next;
     }
@@ -56,11 +69,14 @@ void vl_remove(VoterList *VL, char key[9]) {
 void vl_print(VoterList VL) {
     VoterNode *tmp_node = VL.head;
 
-    printf("Voter List:\n");
+    printf("\t\tVoterList:\n");
+    printf("\t\t\tCount: = %d\n", VL.count);
+    printf("\t\t\t");
     while(tmp_node != NULL) {
         printf("%s -> ", tmp_node->voter->key);
         tmp_node = tmp_node->next;
     }
+    printf("\n\n");
 }
 
 
