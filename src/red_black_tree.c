@@ -111,6 +111,21 @@ void rbt_check_fix(RedBlackTree *RBT, RedBlackNode *new_node) {
 }
 
 
+RedBlackNode* rbt_find_node_by_key(RedBlackTree RBT, char key[9]) {
+    RedBlackNode *found_node = RBT.root;
+
+    while (found_node != NULL && strcmp(found_node->key, key) != 0) {
+        if (strcmp(found_node->key, key) < 0) {
+            found_node = found_node->right;
+        } else {
+            found_node = found_node->left;
+        }
+    }
+
+    return found_node;
+}
+
+
 RedBlackNode* rbt_insert(RedBlackTree *RBT, char key[9], char postcode[6]) {
     RedBlackNode *parent_node, *tmp_node, *new_node;
 

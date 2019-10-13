@@ -26,13 +26,13 @@ PostCodeNode* create_postcode_node(char postcode[6]) {
 
 
 PostCodeNode* pcl_find_node_by_postcode(PostCodeList PCL, char postcode[6]) {
-    PostCodeNode *tmp_node = PCL.head;
+    PostCodeNode *found_node = PCL.head;
 
-    while (tmp_node != NULL && strcmp(tmp_node->postcode, postcode) != 0) {
-        tmp_node = tmp_node->next;
+    while (found_node != NULL && strcmp(found_node->postcode, postcode) != 0) {
+        found_node = found_node->next;
     }
 
-    return tmp_node;
+    return found_node;
 }
 
 

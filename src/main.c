@@ -25,7 +25,7 @@ int main(int argc, char *argv[]) {
     printf("Number of lines: %d\n", lines_count);
 
     // Find optimal number of bits for Bloom Filter
-    bf_size = get_prime_number(lines_count * 3);
+    bf_size = get_optimal_bf_size(lines_count * 3);
 
     // Init data structures
     bloom_init(&BF, bf_size);
@@ -42,6 +42,9 @@ int main(int argc, char *argv[]) {
     bloom_print(BF);
     // rbt_print(RBT);
     pcl_print(PCL);
+
+    // Listen for user input
+    listen_for_commands(&BF, &RBT, &PCL);
 
     // Free allocated memory of data structures
     pcl_free(PCL);

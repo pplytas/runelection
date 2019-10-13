@@ -5,7 +5,7 @@
 #include "utilities.h"
 
 
-int get_prime_number(int number) {
+int get_optimal_bf_size(int number) {
     int i, flag = 1;
     int min_prime;
 
@@ -80,7 +80,7 @@ void insert_records(BloomFilter *BF, RedBlackTree *RBT, PostCodeList *PCL, FILE 
 
         tokenize_string(line, tokens);
 
-        bloom_add(BF, &tokens[0], strlen(tokens[0]) + 1);
+        bloom_add(BF, tokens[0], strlen(tokens[0]));
         new_node = rbt_insert(RBT, tokens[0], tokens[5]);
         pcl_insert(PCL, new_node);
 
@@ -96,4 +96,85 @@ void insert_records(BloomFilter *BF, RedBlackTree *RBT, PostCodeList *PCL, FILE 
     if (line != NULL) {
         free(line);
     }
+}
+
+
+void listen_for_commands(BloomFilter *BF, RedBlackTree *RBT, PostCodeList *PCL){
+    size_t len = 0;
+    ssize_t nread;
+    char *line = NULL, *token;
+    RedBlackNode *found_node;
+
+    while(1){
+        nread = getline(&line, &len, stdin);
+        if (line[nread - 1] == '\n') {
+            line[nread - 1] = '\0';
+        }
+
+        if(!strcmp(line, "exit")) break;
+
+        token = strtok(line, " \t");
+        printf("%s\n", token);
+        if(token != NULL){
+            if(strcmp(token, "lbf") == 0){
+                token = strtok(NULL, " \t");
+                if (token != NULL) {
+                    if (bloom_check(*BF, token, strlen(token))) {
+                        printf("KEY %s POSSIBLY-IN REGISTRY\n", token);
+                    } else {
+                        printf("KEY %s Not-in-LBF\n", token);
+                    }
+                }
+            }
+            else if(strcmp(token, "lrb") == 0){
+                token = strtok(NULL, " \t");
+                printf("%s\n", token);
+                if (token != NULL) {
+                    found_node = rbt_find_node_by_key(*RBT, token);
+                    if (found_node != NULL) {
+                        printf("KEY %s FOUND-IN-RBT\n", token);
+                    } else {
+                        printf("KEY %s NOT-IN-RBT\n", token);
+                    }
+                }
+            }
+            else if(strcmp(token, "ins record") == 0){
+                token = strtok(NULL, " \t");
+                printf("%s\n", token);
+            }
+            else if(strcmp(token, "find key") == 0){
+                token = strtok(NULL, " \t");
+                printf("%s\n", token);
+            }
+            else if(strcmp(token, "delete key") == 0){
+                token = strtok(NULL, " \t");
+                printf("%s\n", token);
+            }
+            else if(strcmp(token, "vote key") == 0){
+                token = strtok(NULL, " \t");
+                printf("%s\n", token);
+            }
+            else if(strcmp(token, "load fileofkeys") == 0){
+                token = strtok(NULL, " \t");
+                printf("%s\n", token);
+            }
+            else if(strcmp(token, "voted") == 0){
+                token = strtok(NULL, " \t");
+                printf("%s\n", token);
+            }
+            else if(strcmp(token, "voted postcode") == 0){
+                token = strtok(NULL, " \t");
+                printf("%s\n", token);
+            }
+            else if(strcmp(token, "votedperpc") == 0){
+                token = strtok(NULL, " \t");
+                printf("%s\n", token);
+            }
+            else{
+                printf("Command not recognized\n");
+            }
+        }
+    }
+
+    free(line);
 }

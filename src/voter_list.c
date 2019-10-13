@@ -20,13 +20,13 @@ VoterNode* create_voter_node(RedBlackNode *voter) {
 
 
 VoterNode* vl_find_node_by_key(VoterList VL, char key[9]) {
-    VoterNode *tmp_node = VL.head;
+    VoterNode *found_node = VL.head;
 
-    while (tmp_node != NULL && strcmp(tmp_node->voter->key, key) != 0) {
-        tmp_node = tmp_node->next;
+    while (found_node != NULL && strcmp(found_node->voter->key, key) != 0) {
+        found_node = found_node->next;
     }
 
-    return tmp_node;
+    return found_node;
 }
 
 
