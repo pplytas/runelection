@@ -73,6 +73,10 @@ void insert_records(BloomFilter *BF, RedBlackTree *RBT, PostCodeList *PCL, FILE 
     char *tokens[6];
     RedBlackNode *new_node;
 
+    char *key, *lastname, *firstname, *postcode;
+    int age;
+    char gender;
+
     while ((line_length = getline(&line, &len, fp)) != -1) {
         if (line[line_length - 1] == '\n') {
             line[line_length - 1] = '\0';
@@ -80,16 +84,23 @@ void insert_records(BloomFilter *BF, RedBlackTree *RBT, PostCodeList *PCL, FILE 
 
         tokenize_string(line, tokens);
 
+        key = tokens[0];
+        lastname = tokens[1];
+        firstname = tokens[2];
+        age = atoi(tokens[3]);
+        gender = tokens[4][0];
+        postcode = tokens[5];
+
         bloom_add(BF, tokens[0], strlen(tokens[0]));
-        new_node = rbt_insert(RBT, tokens[0], tokens[5]);
+        new_node = rbt_insert(RBT, key, lastname, firstname, age, gender, postcode);
         pcl_insert(PCL, new_node);
 
-        // printf("Key: %s\n", tokens[0]);
-        // printf("Name: %s\n", tokens[1]);
-        // printf("Surname: %s\n", tokens[2]);
-        // printf("Age: %s\n", tokens[3]);
-        // printf("Gender: %s\n", tokens[4]);
-        // printf("Postcode: %s\n", tokens[5]);
+        // printf("Key: %s\n", key);
+        // printf("Name: %s\n", lastname);
+        // printf("Surname: %s\n", firstname);
+        // printf("Age: %d\n", age);
+        // printf("Gender: %c\n", gender);
+        // printf("Postcode: %s\n", postcode);
         // printf("\n");
     }
 
@@ -128,10 +139,8 @@ void listen_for_commands(BloomFilter *BF, RedBlackTree *RBT, PostCodeList *PCL){
             }
             else if(strcmp(token, "lrb") == 0){
                 token = strtok(NULL, " \t");
-                printf("%s\n", token);
                 if (token != NULL) {
-                    found_node = rbt_find_node_by_key(*RBT, token);
-                    if (found_node != NULL) {
+                    if (rbt_find_node_by_key(*RBT, token) != NULL) {
                         printf("KEY %s FOUND-IN-RBT\n", token);
                     } else {
                         printf("KEY %s NOT-IN-RBT\n", token);
@@ -142,9 +151,20 @@ void listen_for_commands(BloomFilter *BF, RedBlackTree *RBT, PostCodeList *PCL){
                 token = strtok(NULL, " \t");
                 printf("%s\n", token);
             }
-            else if(strcmp(token, "find key") == 0){
+            else if(strcmp(token, "find") == 0){
                 token = strtok(NULL, " \t");
-                printf("%s\n", token);
+                if (token != NULL) {
+                    if (bloom_check(*BF, token, strlen(token))) {  // First check if key in BF then in RBT
+                        found_node = rbt_find_node_by_key(*RBT, token);
+                        if (found_node != NULL) {
+                            printf("REC-IS: %s %s %s %s %d\n", found_node->key, found_node->firstname, found_node->lastname, found_node->postcode, found_node->age);
+                        } else {
+                            printf("REC-WITH %s NOT-in-structs\n", token);
+                        }
+                    } else {
+                        printf("REC-WITH %s NOT-in-structs\n", token);
+                    }
+                }
             }
             else if(strcmp(token, "delete key") == 0){
                 token = strtok(NULL, " \t");

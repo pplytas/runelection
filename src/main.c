@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
 
     // Get number of records
     lines_count = get_lines_count(infile);
-    printf("Number of lines: %d\n", lines_count);
+    printf("Number of lines in file: %d\n\n", lines_count);
 
     // Find optimal number of bits for Bloom Filter
     bf_size = get_optimal_bf_size(lines_count * 3);
