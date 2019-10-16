@@ -11,6 +11,8 @@ struct RedBlackNode {
     char gender;
     char postcode[6];
 
+    int has_voted;
+
     char color;
     RedBlackNode *left;
     RedBlackNode *right;
@@ -29,6 +31,8 @@ void rbt_rotate_right(RedBlackTree *, RedBlackNode *);
 void rbt_check_fix(RedBlackTree *, RedBlackNode *);
 RedBlackNode* rbt_find_node_by_key(RedBlackTree, char[9]);
 RedBlackNode* rbt_insert(RedBlackTree *, char[9], char[12], char[12], int, char, char[6]);
+int rbt_update_node_has_voted(RedBlackNode *, int);
+int rbt_update_has_voted(RedBlackTree, char[9], int);
 void rbt_print_node(RedBlackNode *);
 void rbt_print(RedBlackTree);
 void rbt_free_node(RedBlackNode *);
