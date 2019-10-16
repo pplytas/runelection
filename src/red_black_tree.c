@@ -12,6 +12,7 @@
 void rbt_init(RedBlackTree *RBT) {
     RBT->root = NULL;
     RBT->count = 0;
+    RBT->have_voted_count = 0;
 }
 
 
@@ -180,14 +181,14 @@ int rbt_update_node_has_voted(RedBlackNode *node, int has_voted) {
 }
 
 
-int rbt_update_has_voted(RedBlackTree RBT, char key[9], int has_voted) {
-    RedBlackNode *found_node = rbt_find_node_by_key(RBT, key);
+int rbt_update_has_voted(RedBlackTree *RBT, RedBlackNode *node, int has_voted) {
+    int updated;
 
-    if (found_node == NULL) {
-        return -1;      // Node to update not found
+    updated = rbt_update_node_has_voted(node, has_voted);
+    if (updated) {
+        (RBT->have_voted_count)++;
     }
-
-    return rbt_update_node_has_voted(found_node, has_voted);
+    return updated;
 }
 
 

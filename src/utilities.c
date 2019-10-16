@@ -66,7 +66,6 @@ void tokenize_string(char *string, char *array[6]) {
 
 
 void insert_records(BloomFilter *BF, RedBlackTree *RBT, PostCodeList *PCL, FILE *fp) {
-    int lines_count = 0;
     char *line = NULL;
     size_t len = 0;
     ssize_t line_length;
@@ -122,13 +121,34 @@ RedBlackNode* find_key(BloomFilter BF, RedBlackTree RBT, char key[9]) {
     return found_node;
 }
 
+int vote_key(BloomFilter BF, RedBlackTree *RBT, PostCodeList PCL, char key[9]) {
+    RedBlackNode *found_node;
+    PostCodeNode *found_pcl_node;
+    int updated;
+
+    found_node = find_key(BF, *RBT, key);
+    if (found_node == NULL) {
+        return -1;      // key not found
+    }
+
+    updated = rbt_update_has_voted(RBT, found_node, 1);
+    if (!updated) {
+        return 0;       // key already voted
+    }
+
+    found_pcl_node = pcl_find_node_by_postcode(PCL, found_node->postcode);
+    vl_increase_have_voted_count(&(found_pcl_node->VL), 1);
+    return 1;           // key voted successfully
+}
+
 
 void listen_for_commands(BloomFilter *BF, RedBlackTree *RBT, PostCodeList *PCL){
     size_t len = 0;
     ssize_t nread;
     char *line = NULL, *token;
-    RedBlackNode *found_node;
-    int updated;
+    RedBlackNode *found_rbt_node;
+    PostCodeNode *found_pcl_node;
+    int response;
 
     while(1){
         nread = getline(&line, &len, stdin);
@@ -136,18 +156,17 @@ void listen_for_commands(BloomFilter *BF, RedBlackTree *RBT, PostCodeList *PCL){
             line[nread - 1] = '\0';
         }
 
-        if(!strcmp(line, "exit")) break;
+        if(strcmp(line, "exit") == 0) break;
 
         token = strtok(line, " \t");
-        printf("%s\n", token);
         if(token != NULL){
             if(strcmp(token, "lbf") == 0) {
                 token = strtok(NULL, " \t");
                 if (token != NULL) {
                     if (bloom_check(*BF, token, strlen(token))) {
-                        printf("KEY %s POSSIBLY-IN REGISTRY\n", token);
+                        printf("# KEY %s POSSIBLY-IN REGISTRY\n", token);
                     } else {
-                        printf("KEY %s Not-in-LBF\n", token);
+                        printf("# KEY %s Not-in-LBF\n", token);
                     }
                 }
             }
@@ -155,9 +174,9 @@ void listen_for_commands(BloomFilter *BF, RedBlackTree *RBT, PostCodeList *PCL){
                 token = strtok(NULL, " \t");
                 if (token != NULL) {
                     if (rbt_find_node_by_key(*RBT, token) != NULL) {
-                        printf("KEY %s FOUND-IN-RBT\n", token);
+                        printf("# KEY %s FOUND-IN-RBT\n", token);
                     } else {
-                        printf("KEY %s NOT-IN-RBT\n", token);
+                        printf("# KEY %s NOT-IN-RBT\n", token);
                     }
                 }
             }
@@ -168,11 +187,11 @@ void listen_for_commands(BloomFilter *BF, RedBlackTree *RBT, PostCodeList *PCL){
             else if(strcmp(token, "find") == 0) {
                 token = strtok(NULL, " \t");
                 if (token != NULL) {
-                    found_node = find_key(*BF, *RBT, token);
-                    if (found_node != NULL) {
-                        printf("REC-IS: %s %s %s %s %d\n", found_node->key, found_node->firstname, found_node->lastname, found_node->postcode, found_node->age);
+                    found_rbt_node = find_key(*BF, *RBT, token);
+                    if (found_rbt_node != NULL) {
+                        printf("# REC-IS: %s %s %s %s %d\n", found_rbt_node->key, found_rbt_node->firstname, found_rbt_node->lastname, found_rbt_node->postcode, found_rbt_node->age);
                     } else {
-                        printf("REC-WITH %s NOT-in-structs\n", token);
+                        printf("# REC-WITH %s NOT-in-structs\n", token);
                     }
                 }
             }
@@ -183,16 +202,14 @@ void listen_for_commands(BloomFilter *BF, RedBlackTree *RBT, PostCodeList *PCL){
             else if(strcmp(token, "vote") == 0) {
                 token = strtok(NULL, " \t");
                 if (token != NULL) {
-                    found_node = find_key(*BF, *RBT, token);
-                    if (found_node != NULL) {
-                        updated = rbt_update_node_has_voted(found_node, 1);
-                        if (updated) {
-                            printf("REC-WITH %s SET-VOTED\n", token);
-                        } else {
-                            printf("REC-WITH %s ALREADY-VOTED\n", token);
-                        }
+                    response = vote_key(*BF, RBT, *PCL, token);
+                    if (response == 1) {
+                        printf("# REC-WITH %s SET-VOTED\n", token);
+                        pcl_print(*PCL);
+                    } else if (response == 0) {
+                        printf("# REC-WITH %s ALREADY-VOTED\n", token);
                     } else {
-                        printf("REC-WITH %s NOT-in-structs\n", token);
+                        printf("- REC-WITH %s NOT-in-structs\n", token);
                     }
                 }
             }
@@ -202,11 +219,16 @@ void listen_for_commands(BloomFilter *BF, RedBlackTree *RBT, PostCodeList *PCL){
             }
             else if(strcmp(token, "voted") == 0) {
                 token = strtok(NULL, " \t");
-                printf("%s\n", token);
-            }
-            else if(strcmp(token, "voted postcode") == 0) {
-                token = strtok(NULL, " \t");
-                printf("%s\n", token);
+                if (token == NULL) {
+                    printf("# NUMBER %d\n", RBT->have_voted_count);
+                } else {
+                    found_pcl_node = pcl_find_node_by_postcode(*PCL, token);
+                    if (found_pcl_node != NULL) {
+                        printf("# IN %s VOTERS-ARE %d\n", token, (found_pcl_node->VL).have_voted_count);
+                    } else {
+                        printf("# IN %s VOTERS-ARE 0\n", token);
+                    }
+                }
             }
             else if(strcmp(token, "votedperpc") == 0) {
                 token = strtok(NULL, " \t");

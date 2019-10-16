@@ -91,9 +91,9 @@ int bloom_add(BloomFilter *BF, void *buffer, int len) {
 
 void bloom_print(BloomFilter BF) {
     printf("Bloom Filter\n");
-    printf("\tcount = %d\n", BF.count);
-    printf("\tbits = %d\n", BF.bits);
-    printf("\tbytes = %d\n\n", BF.bytes);
+    printf("\tCount = %d\n", BF.count);
+    printf("\tBits = %d\n", BF.bits);
+    printf("\tBytes = %d\n\n", BF.bytes);
 }
 
 

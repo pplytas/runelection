@@ -7,8 +7,7 @@
 
 void pcl_init(PostCodeList *PCL) {
     PCL->head = NULL;
-    PCL->postcodes_count = 0;
-    PCL->voters_count = 0;
+    PCL->count = 0;
 }
 
 
@@ -44,14 +43,12 @@ void pcl_insert(PostCodeList *PCL, RedBlackNode *voter) {
         new_postcode_node->next = PCL->head;
         PCL->head = new_postcode_node;
 
-        (PCL->postcodes_count)++;
+        (PCL->count)++;
 
         found_node = new_postcode_node;
     }
 
     vl_insert(&(found_node->VL), voter);
-
-    (PCL->voters_count)++;
 }
 
 
@@ -73,7 +70,7 @@ void pcl_insert(PostCodeList *PCL, RedBlackNode *voter) {
 //     }
 //     free(node_to_delete);
 
-//     (VL->postcodes_count)--;
+//     (VL->count)--;
 // }
 
 
@@ -87,8 +84,7 @@ void pcl_print(PostCodeList PCL) {
     PostCodeNode *tmp_node = PCL.head;
 
     printf("PostCodeList:\n");
-    printf("\tPostcodes Count = %d\n", PCL.postcodes_count);
-    printf("\tVoters Count = %d\n", PCL.voters_count);
+    printf("\tCount = %d\n", PCL.count);
     printf("\tPostCodeNodes:\n\n");
     while(tmp_node != NULL) {
         pcl_print_node(tmp_node);

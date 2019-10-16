@@ -14,8 +14,7 @@ struct PostCodeNode {
 
 typedef struct PostCodeList {
     PostCodeNode *head;
-    int postcodes_count;
-    int voters_count;
+    int count;
 } PostCodeList;
 
 void pcl_init(PostCodeList *);

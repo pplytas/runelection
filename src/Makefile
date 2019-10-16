@@ -3,7 +3,7 @@ CC=gcc
 IDIR =../include
 ODIR=./obj
 
-CFLAGS=-I $(IDIR)
+CFLAGS=-I $(IDIR) -Wall
 LIBS=-lm
 
 _DEPS = utilities.h bloom_filter.h murmurhash2.h red_black_tree.h postcode_list.h voter_list.h

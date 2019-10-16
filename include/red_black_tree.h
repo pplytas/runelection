@@ -22,6 +22,7 @@ struct RedBlackNode {
 typedef struct RedBlackTree {
     RedBlackNode *root;
     int count;
+    int have_voted_count;
 } RedBlackTree;
 
 void rbt_init(RedBlackTree *);
@@ -32,7 +33,7 @@ void rbt_check_fix(RedBlackTree *, RedBlackNode *);
 RedBlackNode* rbt_find_node_by_key(RedBlackTree, char[9]);
 RedBlackNode* rbt_insert(RedBlackTree *, char[9], char[12], char[12], int, char, char[6]);
 int rbt_update_node_has_voted(RedBlackNode *, int);
-int rbt_update_has_voted(RedBlackTree, char[9], int);
+int rbt_update_has_voted(RedBlackTree *, RedBlackNode *, int);
 void rbt_print_node(RedBlackNode *);
 void rbt_print(RedBlackTree);
 void rbt_free_node(RedBlackNode *);

@@ -11,6 +11,7 @@ int get_lines_count(FILE *);
 void tokenize_string(char *, char *[6]);
 void insert_records(BloomFilter *, RedBlackTree *, PostCodeList *, FILE *);
 RedBlackNode* find_key(BloomFilter, RedBlackTree, char[9]);
+int vote_key(BloomFilter, RedBlackTree *, PostCodeList, char[9]);
 void listen_for_commands(BloomFilter *, RedBlackTree *, PostCodeList *);
 
 #endif

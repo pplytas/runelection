@@ -7,7 +7,8 @@
 
 void vl_init(VoterList *VL) {
     VL->head = NULL;
-    VL->count = 0;
+    VL->voters_count = 0;
+    VL->have_voted_count = 0;
 }
 
 
@@ -40,7 +41,12 @@ void vl_insert(VoterList *VL, RedBlackNode *voter) {
         VL->head = new_voter_node;
     }
 
-    (VL->count)++;
+    (VL->voters_count)++;
+}
+
+
+void vl_increase_have_voted_count(VoterList *VL, int amount) {
+    VL->have_voted_count += amount;
 }
 
 
@@ -62,7 +68,7 @@ void vl_remove(VoterList *VL, char key[9]) {
     }
     free(node_to_delete);
 
-    (VL->count)--;
+    (VL->voters_count)--;
 }
 
 
@@ -70,7 +76,8 @@ void vl_print(VoterList VL) {
     VoterNode *tmp_node = VL.head;
 
     printf("\t\tVoterList:\n");
-    printf("\t\t\tCount: = %d\n", VL.count);
+    printf("\t\t\tVoters Count: = %d\n", VL.voters_count);
+    printf("\t\t\tHave Voted Count: = %d\n", VL.have_voted_count);
     printf("\t\t\t");
     while(tmp_node != NULL) {
         printf("%s -> ", tmp_node->voter->key);
