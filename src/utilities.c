@@ -110,11 +110,25 @@ void insert_records(BloomFilter *BF, RedBlackTree *RBT, PostCodeList *PCL, FILE 
 }
 
 
+RedBlackNode* find_key(BloomFilter BF, RedBlackTree RBT, char key[9]) {
+    RedBlackNode *found_node;
+
+    if (bloom_check(BF, key, strlen(key))) {  // First check if key in BF
+        found_node = rbt_find_node_by_key(RBT, key);  // Then check in RBT
+    } else {
+        found_node = NULL;
+    }
+
+    return found_node;
+}
+
+
 void listen_for_commands(BloomFilter *BF, RedBlackTree *RBT, PostCodeList *PCL){
     size_t len = 0;
     ssize_t nread;
     char *line = NULL, *token;
     RedBlackNode *found_node;
+    int updated;
 
     while(1){
         nread = getline(&line, &len, stdin);
@@ -127,7 +141,7 @@ void listen_for_commands(BloomFilter *BF, RedBlackTree *RBT, PostCodeList *PCL){
         token = strtok(line, " \t");
         printf("%s\n", token);
         if(token != NULL){
-            if(strcmp(token, "lbf") == 0){
+            if(strcmp(token, "lbf") == 0) {
                 token = strtok(NULL, " \t");
                 if (token != NULL) {
                     if (bloom_check(*BF, token, strlen(token))) {
@@ -137,7 +151,7 @@ void listen_for_commands(BloomFilter *BF, RedBlackTree *RBT, PostCodeList *PCL){
                     }
                 }
             }
-            else if(strcmp(token, "lrb") == 0){
+            else if(strcmp(token, "lrb") == 0) {
                 token = strtok(NULL, " \t");
                 if (token != NULL) {
                     if (rbt_find_node_by_key(*RBT, token) != NULL) {
@@ -147,50 +161,58 @@ void listen_for_commands(BloomFilter *BF, RedBlackTree *RBT, PostCodeList *PCL){
                     }
                 }
             }
-            else if(strcmp(token, "ins record") == 0){
+            else if(strcmp(token, "ins record") == 0) {
                 token = strtok(NULL, " \t");
                 printf("%s\n", token);
             }
-            else if(strcmp(token, "find") == 0){
+            else if(strcmp(token, "find") == 0) {
                 token = strtok(NULL, " \t");
                 if (token != NULL) {
-                    if (bloom_check(*BF, token, strlen(token))) {  // First check if key in BF then in RBT
-                        found_node = rbt_find_node_by_key(*RBT, token);
-                        if (found_node != NULL) {
-                            printf("REC-IS: %s %s %s %s %d\n", found_node->key, found_node->firstname, found_node->lastname, found_node->postcode, found_node->age);
+                    found_node = find_key(*BF, *RBT, token);
+                    if (found_node != NULL) {
+                        printf("REC-IS: %s %s %s %s %d\n", found_node->key, found_node->firstname, found_node->lastname, found_node->postcode, found_node->age);
+                    } else {
+                        printf("REC-WITH %s NOT-in-structs\n", token);
+                    }
+                }
+            }
+            else if(strcmp(token, "delete key") == 0) {
+                token = strtok(NULL, " \t");
+                printf("%s\n", token);
+            }
+            else if(strcmp(token, "vote") == 0) {
+                token = strtok(NULL, " \t");
+                if (token != NULL) {
+                    found_node = find_key(*BF, *RBT, token);
+                    if (found_node != NULL) {
+                        updated = rbt_update_node_has_voted(found_node, 1);
+                        if (updated) {
+                            printf("REC-WITH %s SET-VOTED\n", token);
                         } else {
-                            printf("REC-WITH %s NOT-in-structs\n", token);
+                            printf("REC-WITH %s ALREADY-VOTED\n", token);
                         }
                     } else {
                         printf("REC-WITH %s NOT-in-structs\n", token);
                     }
                 }
             }
-            else if(strcmp(token, "delete key") == 0){
+            else if(strcmp(token, "load fileofkeys") == 0) {
                 token = strtok(NULL, " \t");
                 printf("%s\n", token);
             }
-            else if(strcmp(token, "vote key") == 0){
+            else if(strcmp(token, "voted") == 0) {
                 token = strtok(NULL, " \t");
                 printf("%s\n", token);
             }
-            else if(strcmp(token, "load fileofkeys") == 0){
+            else if(strcmp(token, "voted postcode") == 0) {
                 token = strtok(NULL, " \t");
                 printf("%s\n", token);
             }
-            else if(strcmp(token, "voted") == 0){
+            else if(strcmp(token, "votedperpc") == 0) {
                 token = strtok(NULL, " \t");
                 printf("%s\n", token);
             }
-            else if(strcmp(token, "voted postcode") == 0){
-                token = strtok(NULL, " \t");
-                printf("%s\n", token);
-            }
-            else if(strcmp(token, "votedperpc") == 0){
-                token = strtok(NULL, " \t");
-                printf("%s\n", token);
-            }
-            else{
+            else {
                 printf("Command not recognized\n");
             }
         }

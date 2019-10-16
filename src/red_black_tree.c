@@ -25,6 +25,8 @@ RedBlackNode* create_red_black_node(char key[9], char lastname[12], char firstna
     new_node->gender = gender;
     strcpy(new_node->postcode, postcode);
 
+    new_node->has_voted = 0;
+
     new_node->color = RED;
     new_node->left = NULL;
     new_node->right = NULL;
@@ -165,6 +167,27 @@ RedBlackNode* rbt_insert(RedBlackTree *RBT, char key[9], char lastname[12], char
     rbt_check_fix(RBT, new_node);
 
     return new_node;
+}
+
+
+int rbt_update_node_has_voted(RedBlackNode *node, int has_voted) {
+    if (node->has_voted == has_voted) {
+        return 0;       // Node already updated
+    }
+
+    node->has_voted = has_voted;
+    return 1;       // Node updated successfully
+}
+
+
+int rbt_update_has_voted(RedBlackTree RBT, char key[9], int has_voted) {
+    RedBlackNode *found_node = rbt_find_node_by_key(RBT, key);
+
+    if (found_node == NULL) {
+        return -1;      // Node to update not found
+    }
+
+    return rbt_update_node_has_voted(found_node, has_voted);
 }
 
 
