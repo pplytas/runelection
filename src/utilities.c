@@ -51,17 +51,53 @@ int get_lines_count(FILE *fp) {
 }
 
 
-void tokenize_string(char *string, char *array[6]) {
+int get_record_info_from_tokenized_string(char *tokenized_string, char *array[6]) {
     int i;
-    char *token_ptr;
-
-    i = 0;
-    token_ptr = strtok(string, " ");
-    while (token_ptr != NULL) {
-        array[i] = token_ptr;
-        token_ptr = strtok(NULL, " ");
-        i++;
+    for (i = 0; i < 6; i++) {
+        array[i] = tokenized_string;
+        tokenized_string = strtok(NULL, " ");
+        if (tokenized_string == NULL && i < 5) return 0;    // Some info missing
     }
+    return 1;
+}
+
+
+int get_record_info(char *string, char *array[6]) {
+    char *tokenized_string = strtok(string, " ");
+    return get_record_info_from_tokenized_string(tokenized_string, array);
+}
+
+
+int insert_key(BloomFilter *BF, RedBlackTree *RBT, PostCodeList *PCL, char *record_info[6]) {
+    char *key, *lastname, *firstname, *postcode;
+    int age;
+    char gender;
+    RedBlackNode *new_node;
+
+    key = record_info[0];
+    lastname = record_info[1];
+    firstname = record_info[2];
+    age = atoi(record_info[3]);
+    gender = record_info[4][0];
+    postcode = record_info[5];
+
+    // printf("Key: %s\n", key);
+    // printf("Lastname: %s\n", lastname);
+    // printf("Firstname: %s\n", firstname);
+    // printf("Age: %d\n", age);
+    // printf("Gender: %c\n", gender);
+    // printf("Postcode: %s\n", postcode);
+    // printf("\n");
+
+    bloom_add(BF, key, strlen(key));
+
+    new_node = rbt_insert(RBT, key, lastname, firstname, age, gender, postcode);
+    if (new_node == NULL) {
+        return 0;       // key already exists
+    }
+
+    pcl_insert(PCL, new_node);
+    return 1;           // key inserted successfully
 }
 
 
@@ -69,38 +105,23 @@ void insert_records(BloomFilter *BF, RedBlackTree *RBT, PostCodeList *PCL, FILE 
     char *line = NULL;
     size_t len = 0;
     ssize_t line_length;
-    char *tokens[6];
-    RedBlackNode *new_node;
-
-    char *key, *lastname, *firstname, *postcode;
-    int age;
-    char gender;
+    char *record_info[6];
+    int response;
 
     while ((line_length = getline(&line, &len, fp)) != -1) {
         if (line[line_length - 1] == '\n') {
             line[line_length - 1] = '\0';
         }
 
-        tokenize_string(line, tokens);
-
-        key = tokens[0];
-        lastname = tokens[1];
-        firstname = tokens[2];
-        age = atoi(tokens[3]);
-        gender = tokens[4][0];
-        postcode = tokens[5];
-
-        bloom_add(BF, tokens[0], strlen(tokens[0]));
-        new_node = rbt_insert(RBT, key, lastname, firstname, age, gender, postcode);
-        pcl_insert(PCL, new_node);
-
-        // printf("Key: %s\n", key);
-        // printf("Name: %s\n", lastname);
-        // printf("Surname: %s\n", firstname);
-        // printf("Age: %d\n", age);
-        // printf("Gender: %c\n", gender);
-        // printf("Postcode: %s\n", postcode);
-        // printf("\n");
+        response = get_record_info(line, record_info);
+        if (response) {
+            response = insert_key(BF, RBT, PCL, record_info);
+            if (response) {
+                printf("# REC-WITH %s INSERTED-IN-BF-RBT\n", record_info[0]);
+            } else {
+                printf("- REC-WITH %s EXISTS\n", record_info[0]);
+            }
+        }
     }
 
     if (line != NULL) {
@@ -146,6 +167,7 @@ void listen_for_commands(BloomFilter *BF, RedBlackTree *RBT, PostCodeList *PCL){
     size_t len = 0;
     ssize_t nread;
     char *line = NULL, *token;
+    char *record_info[6];
     RedBlackNode *found_rbt_node;
     PostCodeNode *found_pcl_node;
     int response;
@@ -180,9 +202,17 @@ void listen_for_commands(BloomFilter *BF, RedBlackTree *RBT, PostCodeList *PCL){
                     }
                 }
             }
-            else if(strcmp(token, "ins record") == 0) {
+            else if(strcmp(token, "ins") == 0) {
                 token = strtok(NULL, " \t");
-                printf("%s\n", token);
+                response = get_record_info_from_tokenized_string(token, record_info);
+                if (response) {
+                    response = insert_key(BF, RBT, PCL, record_info);
+                    if (response) {
+                        printf("# REC-WITH %s INSERTED-IN-BF-RBT\n", record_info[0]);
+                    } else {
+                        printf("- REC-WITH %s EXISTS\n", record_info[0]);
+                    }
+                }
             }
             else if(strcmp(token, "find") == 0) {
                 token = strtok(NULL, " \t");

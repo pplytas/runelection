@@ -75,7 +75,7 @@ void rbt_rotate_right(RedBlackTree *RBT, RedBlackNode *pivot_node) {
 }
 
 
-void rbt_check_fix(RedBlackTree *RBT, RedBlackNode *new_node) {
+void rbt_fix(RedBlackTree *RBT, RedBlackNode *new_node) {
     RedBlackNode *temp_node;
 
     while (new_node->parent != NULL && new_node->parent->color == RED) {
@@ -133,6 +133,20 @@ RedBlackNode* rbt_find_node_by_key(RedBlackTree RBT, char key[9]) {
 }
 
 
+void rbt_insert_child_node(RedBlackTree *RBT, RedBlackNode *parent_node, RedBlackNode *child_node) {
+    if (parent_node != NULL) {
+        child_node->parent = parent_node;
+        if (strcmp(child_node->key, parent_node->key) < 0) {
+            parent_node->left = child_node;
+        } else {
+            parent_node->right = child_node;
+        }
+    } else {
+       RBT->root = child_node;        // Set root node
+    }
+}
+
+
 RedBlackNode* rbt_insert(RedBlackTree *RBT, char key[9], char lastname[12], char firstname[12], int age, char gender, char postcode[6]) {
     RedBlackNode *parent_node, *tmp_node, *new_node;
 
@@ -142,30 +156,18 @@ RedBlackNode* rbt_insert(RedBlackTree *RBT, char key[9], char lastname[12], char
     while (tmp_node != NULL) {
         parent_node = tmp_node;
         if (strcmp(key, tmp_node->key) < 0) {
-            tmp_node = tmp_node->left;
+            tmp_node = tmp_node->left;      // key is smaller than currently checked node
+        } else if (strcmp(key, tmp_node->key) > 0) {
+            tmp_node = tmp_node->right;     // key is greater than currently checked node
         } else {
-            tmp_node = tmp_node->right;
+            return NULL;                    // key already exists in currently checked node
         }
     }
 
-    // Create new node with given key
     new_node = create_red_black_node(key, lastname, firstname, age, gender, postcode);
+    rbt_insert_child_node(RBT, parent_node, new_node);
 
-    // Insert new node in tree
-    if (parent_node != NULL) {
-        new_node->parent = parent_node;
-
-        if (strcmp(new_node->key, parent_node->key) < 0) {
-            parent_node->left = new_node;
-        } else {
-            parent_node->right = new_node;
-        }
-    } else {
-       RBT->root = new_node;        // Set root node
-    }
-
-    // Ensure the Red-Black property is maintained
-    rbt_check_fix(RBT, new_node);
+    rbt_fix(RBT, new_node);                 // Ensure the Red-Black property is maintained
 
     return new_node;
 }

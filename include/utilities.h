@@ -8,7 +8,9 @@
 
 int get_optimal_bf_size(int);
 int get_lines_count(FILE *);
-void tokenize_string(char *, char *[6]);
+int get_record_info_from_tokenized_string(char *, char *[6]);
+int get_record_info(char *, char *[6]);
+int insert_key(BloomFilter *, RedBlackTree *, PostCodeList *, char *[6]);
 void insert_records(BloomFilter *, RedBlackTree *, PostCodeList *, FILE *);
 RedBlackNode* find_key(BloomFilter, RedBlackTree, char[9]);
 int vote_key(BloomFilter, RedBlackTree *, PostCodeList, char[9]);
