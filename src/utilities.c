@@ -5,6 +5,29 @@
 #include "utilities.h"
 
 
+void check_errors(void *response, char *error, int will_exit) {
+    if (response == NULL){
+        perror(error);
+        if (will_exit) {
+            exit(EXIT_FAILURE);
+        }
+    }
+}
+
+
+void get_command_line_arguments(int argc, char *argv[], char *arguments[3]) {
+    for (int i = 1; i < (argc - 1); i++) {
+        if ((strcmp(argv[i], "-i") == 0) && ((strcmp(argv[i+1], "-o") != 0)) && ((strcmp(argv[i+1], "-n") != 0))) {
+            arguments[0] = argv[i+1];
+        } else if (strcmp(argv[i], "-o") == 0 && ((strcmp(argv[i+1], "-i") != 0)) && ((strcmp(argv[i+1], "-n") != 0))) {
+            arguments[1] = argv[i+1];
+        } else if (strcmp(argv[i], "-n") == 0 && ((strcmp(argv[i+1], "-i") != 0)) && ((strcmp(argv[i+1], "-o") != 0))) {
+            arguments[2] = argv[i+1];
+        }
+    }
+}
+
+
 int get_optimal_bf_size(int number) {
     int i, flag = 1;
     int min_prime;
@@ -163,6 +186,40 @@ int vote_key(BloomFilter BF, RedBlackTree *RBT, PostCodeList PCL, char key[9]) {
 }
 
 
+void load_fileofkeys(BloomFilter BF, RedBlackTree *RBT, PostCodeList PCL, char *filepath) {
+    FILE *fp;
+    char *line = NULL;
+    size_t len = 0;
+    ssize_t line_length;
+    int response;
+
+    fp = fopen(filepath, "r");
+    check_errors(fp, "fopen", 0);
+    if (fp == NULL) return;
+
+    while ((line_length = getline(&line, &len, fp)) != -1) {
+        if (line[line_length - 1] == '\n') {
+            line[line_length - 1] = '\0';
+        }
+
+        response = vote_key(BF, RBT, PCL, line);
+        if (response == 1) {
+            printf("# REC-WITH %s SET-VOTED\n", line);
+        } else if (response == 0) {
+            printf("# REC-WITH %s ALREADY-VOTED\n", line);
+        } else {
+            printf("- REC-WITH %s NOT-in-structs\n", line);
+        }
+    }
+
+    if (line != NULL) {
+        free(line);
+    }
+
+    fclose(fp);
+}
+
+
 void listen_for_commands(BloomFilter *BF, RedBlackTree *RBT, PostCodeList *PCL){
     size_t len = 0;
     ssize_t nread;
@@ -235,7 +292,6 @@ void listen_for_commands(BloomFilter *BF, RedBlackTree *RBT, PostCodeList *PCL){
                     response = vote_key(*BF, RBT, *PCL, token);
                     if (response == 1) {
                         printf("# REC-WITH %s SET-VOTED\n", token);
-                        pcl_print(*PCL);
                     } else if (response == 0) {
                         printf("# REC-WITH %s ALREADY-VOTED\n", token);
                     } else {
@@ -243,9 +299,11 @@ void listen_for_commands(BloomFilter *BF, RedBlackTree *RBT, PostCodeList *PCL){
                     }
                 }
             }
-            else if(strcmp(token, "load fileofkeys") == 0) {
+            else if(strcmp(token, "load") == 0) {
                 token = strtok(NULL, " \t");
-                printf("%s\n", token);
+                if (token != NULL) {
+                    load_fileofkeys(*BF, RBT, *PCL, token);
+                }
             }
             else if(strcmp(token, "voted") == 0) {
                 token = strtok(NULL, " \t");

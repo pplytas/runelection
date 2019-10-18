@@ -9,14 +9,14 @@ LIBS=-lm
 _DEPS = utilities.h bloom_filter.h murmurhash2.h red_black_tree.h postcode_list.h voter_list.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 
-_OBJ = main.o utilities.o bloom_filter.o murmurhash2.o red_black_tree.o postcode_list.o voter_list.o
+_OBJ = runelection.o utilities.o bloom_filter.o murmurhash2.o red_black_tree.o postcode_list.o voter_list.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 
 $(ODIR)/%.o: %.c $(DEPS) | $(ODIR)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-main: $(OBJ)
+runelection: $(OBJ)
 	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
 	@echo "Executable file \"$@\" created";
 
