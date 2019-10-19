@@ -49,9 +49,9 @@ int main(int argc, char *argv[]) {
 
     listen_for_commands(&BF, &RBT, &PCL);       // Listen for user input
 
-    // if (outfile != NULL) {
-    //     store_new_registry();                   // Store new registry in outfile
-    // }
+    if (outfile != NULL) {
+        write_new_registry(RBT, outfile);                   // Store new registry in outfile
+    }
 
     // Free allocated memory of data structures
     pcl_free(PCL);

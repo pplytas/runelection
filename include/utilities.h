@@ -18,5 +18,6 @@ RedBlackNode* find_key(BloomFilter, RedBlackTree, char[9]);
 int vote_key(BloomFilter, RedBlackTree *, PostCodeList, char[9]);
 void load_fileofkeys(BloomFilter, RedBlackTree *, PostCodeList, char *);
 void listen_for_commands(BloomFilter *, RedBlackTree *, PostCodeList *);
+void write_new_registry(RedBlackTree, char *);
 
 #endif

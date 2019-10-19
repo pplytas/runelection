@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "utilities.h"
+#include "stack.h"
 
 
 void check_errors(void *response, char *error, int will_exit) {
@@ -329,4 +330,31 @@ void listen_for_commands(BloomFilter *BF, RedBlackTree *RBT, PostCodeList *PCL){
     }
 
     free(line);
+}
+
+
+void write_new_registry(RedBlackTree RBT, char *filepath) {
+    FILE *fp;
+    RedBlackNode *rbt_node;
+    Stack S;
+
+    fp = fopen(filepath, "w");
+    check_errors(fp, "fopen", 0);
+
+    stack_init(&S);
+    stack_push(&S, RBT.root);
+    while (!stack_is_empty(S)) {
+        rbt_node = stack_pop(&S);
+
+        if (rbt_node->left != NULL) {
+            stack_push(&S, rbt_node->left);
+        }
+        if (rbt_node->right != NULL) {
+            stack_push(&S, rbt_node->right);
+        }
+
+        fprintf(fp, "%s  %s %s %d  %c %s\n", rbt_node->key, rbt_node->lastname, rbt_node->firstname, rbt_node->age, rbt_node->gender, rbt_node->postcode);
+    }
+
+    fclose(fp);
 }
