@@ -340,6 +340,7 @@ void write_new_registry(RedBlackTree RBT, char *filepath) {
 
     fp = fopen(filepath, "w");
     check_errors(fp, "fopen", 0);
+    if (fp == NULL) return;
 
     stack_init(&S);
     stack_push(&S, RBT.root);
