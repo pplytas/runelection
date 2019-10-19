@@ -37,7 +37,6 @@ int rbt_update_node_has_voted(RedBlackNode *, int);
 int rbt_update_has_voted(RedBlackTree *, RedBlackNode *, int);
 void rbt_print_node(RedBlackNode *);
 void rbt_print(RedBlackTree);
-void rbt_free_node(RedBlackNode *);
 void rbt_free(RedBlackTree);
 
 #endif

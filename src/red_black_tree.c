@@ -220,17 +220,24 @@ void rbt_print(RedBlackTree RBT) {
     rbt_print_node(RBT.root);
 }
 
-void rbt_free_node(RedBlackNode *node) {
-    if (node == NULL) return;
-
-    // Free children
-    rbt_free_node(node->left);
-    rbt_free_node(node->right);
-
-    // Free self
-    free(node);
-}
 
 void rbt_free(RedBlackTree RBT) {
-    rbt_free_node(RBT.root);
+    RedBlackNode *current_node = RBT.root, *next_node;
+
+    while (current_node != NULL) {
+        next_node = current_node->left;
+        current_node->left = NULL;
+
+        if (next_node == NULL) {
+            if (current_node->right != NULL) {
+                next_node = current_node->right;
+                current_node->right = NULL;
+            } else {
+                next_node = current_node->parent;
+                free(current_node);
+            }
+        }
+
+        current_node = next_node;
+    }
 }
