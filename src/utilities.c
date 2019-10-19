@@ -347,11 +347,11 @@ void write_new_registry(RedBlackTree RBT, char *filepath) {
     while (!stack_is_empty(S)) {
         rbt_node = stack_pop(&S);
 
-        if (rbt_node->left != NULL) {
-            stack_push(&S, rbt_node->left);
-        }
         if (rbt_node->right != NULL) {
             stack_push(&S, rbt_node->right);
+        }
+        if (rbt_node->left != NULL) {
+            stack_push(&S, rbt_node->left);
         }
 
         fprintf(fp, "%s  %s %s %d  %c %s\n", rbt_node->key, rbt_node->lastname, rbt_node->firstname, rbt_node->age, rbt_node->gender, rbt_node->postcode);
