@@ -7,9 +7,9 @@
 #include "murmurhash2.h"
 
 
-int bloom_init(BloomFilter *BF, int size) {
+int bloom_init(BloomFilter *BF, int bits) {
     BF->count = 0;
-    BF->bits = size;
+    BF->bits = bits;
 
     if (BF->bits % 8) {
         BF->bytes = (BF->bits / 8) + 1;
@@ -28,54 +28,54 @@ int bloom_init(BloomFilter *BF, int size) {
 
 int test_bit(unsigned char *buf, unsigned int x) {
     unsigned int byte = x >> 3;
-    unsigned char c = buf[byte]; // expensive memory access
+    unsigned char c = buf[byte];
     unsigned int mask = 1 << (x % 8);
 
     if (c & mask) {
         return 1;
-    } else {
-        return 0;
     }
+
+    return 0;
 }
 
 
 int set_bit(unsigned char *buf, unsigned int x) {
     unsigned int byte = x >> 3;
-    unsigned char c = buf[byte]; // expensive memory access
+    unsigned char c = buf[byte];
     unsigned int mask = 1 << (x % 8);
 
     if (c & mask) {
         return 1;
-    } else {
-        buf[byte] = c | mask;
-        return 0;
     }
+
+    buf[byte] = c | mask;
+    return 0;
 }
 
 
-int bloom_check(BloomFilter BF, void *buffer, int len) {
-    int i;
-    unsigned int a = murmurhash2(buffer, len, 0x9747b28c);
-    unsigned int b = murmurhash2(buffer, len, a);
+int bloom_check(BloomFilter BF, char *string) {
+    int length = strlen(string);
+    unsigned int a = murmurhash2(string, length, 0x9747b28c);
+    unsigned int b = murmurhash2(string, length, a);
     unsigned int hash_bits;
 
-    for (i = 0; i < 3; i++) {
+    for (int i = 0; i < 3; i++) {
         hash_bits = (a + i * b) % BF.bits;
-        if (!test_bit(BF.bf, hash_bits)) {
-            return 0;
-        }
+        if (!test_bit(BF.bf, hash_bits)) return 0;
     }
+
     return 1;
 }
 
 
-int bloom_add(BloomFilter *BF, void *buffer, int len) {
-    int i, hits = 0;
-    unsigned int a = murmurhash2(buffer, len, 0x9747b28c);
-    unsigned int b = murmurhash2(buffer, len, a);
+int bloom_add(BloomFilter *BF, char *string) {
+    int hits = 0;
+    int length = strlen(string);
+    unsigned int a = murmurhash2(string, length, 0x9747b28c);
+    unsigned int b = murmurhash2(string, length, a);
     unsigned int hash_bits;
 
-    for (i = 0; i < 3; i++) {
+    for (int i = 0; i < 3; i++) {
         hash_bits = (a + i * b) % BF->bits;
         if (set_bit(BF->bf, hash_bits)) {
             hits++;
@@ -84,8 +84,9 @@ int bloom_add(BloomFilter *BF, void *buffer, int len) {
     (BF->count)++;
 
     if (hits == 3) {
-        return 1; // 1 == element already in (or collision)
+        return 1;
     }
+
     return 0;
 }
 
@@ -97,14 +98,14 @@ void bloom_print(BloomFilter BF) {
 }
 
 
+int bloom_reset(BloomFilter *BF) {
+    memset(BF->bf, 0, BF->bytes);
+    return 0;
+}
+
+
 void bloom_free(BloomFilter BF) {
     if (BF.bf != NULL) {
         free(BF.bf);
     }
-}
-
-
-int bloom_reset(BloomFilter *BF) {
-    memset(BF->bf, 0, BF->bytes);
-    return 0;
 }

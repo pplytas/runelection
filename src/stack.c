@@ -29,7 +29,7 @@ RedBlackNode* stack_pop(Stack *S) {
     RedBlackNode *rbt_node;
 
     if (stack_is_empty(*S)) {
-        printf("attempt to pop the empty stack");
+        printf("Attempt to pop empty stack\n");
         return NULL;
     }
 

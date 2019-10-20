@@ -4,13 +4,12 @@
 typedef struct RedBlackNode RedBlackNode;
 
 struct RedBlackNode {
-    char key[9];
-    char firstname[12];
-    char lastname[12];
+    char *key;
+    char *firstname;
+    char *lastname;
     int age;
     char gender;
-    char postcode[6];
-
+    int postcode;
     int has_voted;
 
     char color;
@@ -26,13 +25,13 @@ typedef struct RedBlackTree {
 } RedBlackTree;
 
 void rbt_init(RedBlackTree *);
-RedBlackNode* create_red_black_node(char[9], char[12], char[12], int, char, char[6]);
+RedBlackNode* create_red_black_node(char *, char *, char *, int, char, int);
 void rbt_rotate_left(RedBlackTree *, RedBlackNode *);
 void rbt_rotate_right(RedBlackTree *, RedBlackNode *);
 void rbt_fix(RedBlackTree *, RedBlackNode *);
-RedBlackNode* rbt_find_node_by_key(RedBlackTree, char[9]);
+RedBlackNode* rbt_find_node_by_key(RedBlackTree, char *);
 void rbt_insert_child_node(RedBlackTree *, RedBlackNode *, RedBlackNode *);
-RedBlackNode* rbt_insert(RedBlackTree *, char[9], char[12], char[12], int, char, char[6]);
+RedBlackNode* rbt_insert(RedBlackTree *, char *, char *, char *, int, char, int);
 int rbt_update_node_has_voted(RedBlackNode *, int);
 int rbt_update_has_voted(RedBlackTree *, RedBlackNode *, int);
 void rbt_print_node(RedBlackNode *);

@@ -16,16 +16,21 @@ void rbt_init(RedBlackTree *RBT) {
 }
 
 
-RedBlackNode* create_red_black_node(char key[9], char lastname[12], char firstname[12], int age, char gender, char postcode[6]) {
+RedBlackNode* create_red_black_node(char *key, char *firstname, char *lastname, int age, char gender, int postcode) {
     RedBlackNode *new_node = (RedBlackNode*) malloc(sizeof(RedBlackNode));
 
+    new_node->key = (char *) malloc((strlen(key) + 1) * sizeof(char));
     strcpy(new_node->key, key);
-    strcpy(new_node->lastname, lastname);
+
+    new_node->firstname = (char *) malloc((strlen(firstname) + 1) * sizeof(char));
     strcpy(new_node->firstname, firstname);
+
+    new_node->lastname = (char *) malloc((strlen(lastname) + 1) * sizeof(char));
+    strcpy(new_node->lastname, lastname);
+
     new_node->age = age;
     new_node->gender = gender;
-    strcpy(new_node->postcode, postcode);
-
+    new_node->postcode = postcode;
     new_node->has_voted = 0;
 
     new_node->color = RED;
@@ -118,7 +123,7 @@ void rbt_fix(RedBlackTree *RBT, RedBlackNode *new_node) {
 }
 
 
-RedBlackNode* rbt_find_node_by_key(RedBlackTree RBT, char key[9]) {
+RedBlackNode* rbt_find_node_by_key(RedBlackTree RBT, char *key) {
     RedBlackNode *found_node = RBT.root;
 
     while (found_node != NULL && strcmp(found_node->key, key) != 0) {
@@ -147,7 +152,7 @@ void rbt_insert_child_node(RedBlackTree *RBT, RedBlackNode *parent_node, RedBlac
 }
 
 
-RedBlackNode* rbt_insert(RedBlackTree *RBT, char key[9], char lastname[12], char firstname[12], int age, char gender, char postcode[6]) {
+RedBlackNode* rbt_insert(RedBlackTree *RBT, char *key, char *lastname, char *firstname, int age, char gender, int postcode) {
     RedBlackNode *parent_node, *tmp_node, *new_node;
 
     // Find where to insert new key
@@ -164,7 +169,7 @@ RedBlackNode* rbt_insert(RedBlackTree *RBT, char key[9], char lastname[12], char
         }
     }
 
-    new_node = create_red_black_node(key, lastname, firstname, age, gender, postcode);
+    new_node = create_red_black_node(key, firstname, lastname, age, gender, postcode);
     rbt_insert_child_node(RBT, parent_node, new_node);
 
     rbt_fix(RBT, new_node);                 // Ensure the Red-Black property is maintained
@@ -221,6 +226,14 @@ void rbt_print(RedBlackTree RBT) {
 }
 
 
+void rbt_free_node(RedBlackNode *node) {
+    free(node->key);
+    free(node->firstname);
+    free(node->lastname);
+    free(node);
+}
+
+
 void rbt_free(RedBlackTree RBT) {
     RedBlackNode *current_node = RBT.root, *next_node;
 
@@ -234,7 +247,7 @@ void rbt_free(RedBlackTree RBT) {
                 current_node->right = NULL;
             } else {
                 next_node = current_node->parent;
-                free(current_node);
+                rbt_free_node(current_node);
             }
         }
 

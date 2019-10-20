@@ -11,23 +11,23 @@ void pcl_init(PostCodeList *PCL) {
 }
 
 
-PostCodeNode* create_postcode_node(char postcode[6]) {
+PostCodeNode* create_postcode_node(int postcode) {
     PostCodeNode *new_postcode_node = (PostCodeNode *) malloc(sizeof(PostCodeNode));
 
     VoterList VL;
     vl_init(&VL);
     new_postcode_node->VL = VL;
-
-    strcpy(new_postcode_node->postcode, postcode);
+    new_postcode_node->postcode = postcode;
     new_postcode_node->next = NULL;
+
     return new_postcode_node;
 }
 
 
-PostCodeNode* pcl_find_node_by_postcode(PostCodeList PCL, char postcode[6]) {
+PostCodeNode* pcl_find_node_by_postcode(PostCodeList PCL, int postcode) {
     PostCodeNode *found_node = PCL.head;
 
-    while (found_node != NULL && strcmp(found_node->postcode, postcode) != 0) {
+    while (found_node != NULL && found_node->postcode != postcode) {
         found_node = found_node->next;
     }
 
@@ -74,8 +74,20 @@ void pcl_insert(PostCodeList *PCL, RedBlackNode *voter) {
 // }
 
 
+void pcl_print_voted_per_postcode(PostCodeList PCL) {
+    PostCodeNode *tmp_node = PCL.head;
+    int voted_percentage;
+
+    while (tmp_node != NULL) {
+        voted_percentage = ((float)tmp_node->VL.have_voted_count / tmp_node->VL.voters_count) * 100;
+        printf("# IN %d VOTERS-ARE %d%%\n", tmp_node->postcode, voted_percentage);
+        tmp_node = tmp_node->next;
+    }
+}
+
+
 void pcl_print_node(PostCodeNode *node) {
-    printf("\t\tPostcode = %s\n", node->postcode);
+    printf("\t\tPostcode = %d\n", node->postcode);
     vl_print(node->VL);
 }
 

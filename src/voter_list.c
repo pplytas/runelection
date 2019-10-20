@@ -20,7 +20,7 @@ VoterNode* create_voter_node(RedBlackNode *voter) {
 }
 
 
-VoterNode* vl_find_node_by_key(VoterList VL, char key[9]) {
+VoterNode* vl_find_node_by_key(VoterList VL, char *key) {
     VoterNode *found_node = VL.head;
 
     while (found_node != NULL && strcmp(found_node->voter->key, key) != 0) {
@@ -50,7 +50,7 @@ void vl_increase_have_voted_count(VoterList *VL, int amount) {
 }
 
 
-void vl_remove(VoterList *VL, char key[9]) {
+void vl_remove(VoterList *VL, char *key) {
     VoterNode *node_to_delete = VL->head;
     VoterNode *previous_node = NULL;
 

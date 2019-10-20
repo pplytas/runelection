@@ -7,7 +7,7 @@
 typedef struct PostCodeNode PostCodeNode;
 
 struct PostCodeNode {
-    char postcode[6];
+    int postcode;
     VoterList VL;
     PostCodeNode *next;
 };
@@ -18,9 +18,10 @@ typedef struct PostCodeList {
 } PostCodeList;
 
 void pcl_init(PostCodeList *);
-PostCodeNode* create_postcode_node(char[6]);
-PostCodeNode* pcl_find_node_by_postcode(PostCodeList, char[6]);
+PostCodeNode* create_postcode_node(int);
+PostCodeNode* pcl_find_node_by_postcode(PostCodeList, int);
 void pcl_insert(PostCodeList *, RedBlackNode *);
+void pcl_print_voted_per_postcode(PostCodeList);
 void pcl_print_node(PostCodeNode *);
 void pcl_print(PostCodeList);
 void pcl_free_node(PostCodeNode *);

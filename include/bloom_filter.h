@@ -11,10 +11,10 @@ typedef struct BloomFilter {
 int bloom_init(BloomFilter *, int);
 int test_bit(unsigned char *, unsigned int);
 int set_bit(unsigned char *, unsigned int);
-int bloom_check(BloomFilter, void *, int);
-int bloom_add(BloomFilter *, void *, int);
+int bloom_check(BloomFilter, char *);
+int bloom_add(BloomFilter *, char *);
 void bloom_print(BloomFilter);
-void bloom_free(BloomFilter);
 int bloom_reset(BloomFilter *);
+void bloom_free(BloomFilter);
 
 #endif

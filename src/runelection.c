@@ -6,7 +6,8 @@
 
 
 int main(int argc, char *argv[]) {
-    char *cl_arguments[3] = {NULL, NULL, NULL}, *inputfile, *outfile;
+    char *cl_arguments[3] = {NULL, NULL, NULL};
+    char *inputfile, *outfile;
     int numofupdates;
 
     int bf_size;
