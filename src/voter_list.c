@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "voter_list.h"
+#include "utilities.h"
 
 
 void vl_init(VoterList *VL) {
@@ -14,6 +15,7 @@ void vl_init(VoterList *VL) {
 
 VoterNode* create_voter_node(RedBlackNode *voter) {
     VoterNode *new_voter_node = (VoterNode *) malloc(sizeof(VoterNode));
+    check_errors(new_voter_node, "malloc", 1);
     new_voter_node->voter = voter;
     new_voter_node->next = NULL;
     return new_voter_node;

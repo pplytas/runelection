@@ -2,7 +2,6 @@
 #define STACK_H
 
 #include "red_black_tree.h"
-#include "utilities.h"
 
 
 typedef struct StackNode StackNode;

@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "red_black_tree.h"
+#include "utilities.h"
 
 #define RED 'R'
 #define BLACK 'B'
@@ -18,14 +19,18 @@ void rbt_init(RedBlackTree *RBT) {
 
 RedBlackNode* create_red_black_node(char *key, char *firstname, char *lastname, int age, char gender, int postcode) {
     RedBlackNode *new_node = (RedBlackNode*) malloc(sizeof(RedBlackNode));
+    check_errors(new_node, "malloc", 1);
 
     new_node->key = (char *) malloc((strlen(key) + 1) * sizeof(char));
+    check_errors(new_node->key, "malloc", 1);
     strcpy(new_node->key, key);
 
     new_node->firstname = (char *) malloc((strlen(firstname) + 1) * sizeof(char));
+    check_errors(new_node->firstname, "malloc", 1);
     strcpy(new_node->firstname, firstname);
 
     new_node->lastname = (char *) malloc((strlen(lastname) + 1) * sizeof(char));
+    check_errors(new_node->lastname, "malloc", 1);
     strcpy(new_node->lastname, lastname);
 
     new_node->age = age;

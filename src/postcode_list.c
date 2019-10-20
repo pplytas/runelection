@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "postcode_list.h"
+#include "utilities.h"
 
 
 void pcl_init(PostCodeList *PCL) {
@@ -13,6 +14,7 @@ void pcl_init(PostCodeList *PCL) {
 
 PostCodeNode* create_postcode_node(int postcode) {
     PostCodeNode *new_postcode_node = (PostCodeNode *) malloc(sizeof(PostCodeNode));
+    check_errors(new_postcode_node, "malloc", 1);
 
     VoterList VL;
     vl_init(&VL);

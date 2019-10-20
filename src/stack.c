@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include "stack.h"
+#include "utilities.h"
 
 
 void stack_init(Stack *S) {

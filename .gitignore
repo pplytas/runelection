@@ -1,3 +1,4 @@
 *.o
 *.sh
 src/runelection
+src/test*

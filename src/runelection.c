@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "utilities.h"
+#include "election_utilities.h"
 
 
 int main(int argc, char *argv[]) {

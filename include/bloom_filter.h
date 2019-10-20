@@ -8,7 +8,7 @@ typedef struct BloomFilter {
     unsigned char *bf;
 } BloomFilter;
 
-int bloom_init(BloomFilter *, int);
+void bloom_init(BloomFilter *, int);
 int test_bit(unsigned char *, unsigned int);
 int set_bit(unsigned char *, unsigned int);
 int bloom_check(BloomFilter, char *);

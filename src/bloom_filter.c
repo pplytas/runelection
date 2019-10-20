@@ -5,9 +5,10 @@
 
 #include "bloom_filter.h"
 #include "murmurhash2.h"
+#include "utilities.h"
 
 
-int bloom_init(BloomFilter *BF, int bits) {
+void bloom_init(BloomFilter *BF, int bits) {
     BF->count = 0;
     BF->bits = bits;
 
@@ -18,11 +19,7 @@ int bloom_init(BloomFilter *BF, int bits) {
     }
 
     BF->bf = (unsigned char *) calloc(BF->bytes, sizeof(unsigned char));
-    if (BF->bf == NULL) {
-        return 1;
-    }
-
-    return 0;
+    check_errors(BF->bf, "malloc", 1);
 }
 
 
