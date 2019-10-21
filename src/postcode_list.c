@@ -54,26 +54,27 @@ void pcl_insert(PostCodeList *PCL, RedBlackNode *voter) {
 }
 
 
-// void pcl_remove(PostCodeList *VL, char key[9]) {
-//     VoterNode *node_to_delete = VL->head;
-//     VoterNode *previous_node = NULL;
+void pcl_remove(PostCodeList *PCL, int postcode, char *key) {
+    PostCodeNode *previous_node = NULL, *found_node = PCL->head;
 
-//     if (node_to_delete == NULL) return;
+    while (found_node != NULL && found_node->postcode != postcode) {
+        previous_node = found_node;
+        found_node = found_node->next;
+    }
+    if (found_node == NULL) return;
 
-//     while (strcmp(node_to_delete->voter->key, key) != 0) {
-//         previous_node = node_to_delete;
-//         node_to_delete = node_to_delete->next;
-//     }
+    vl_remove(&(found_node->VL), key);
 
-//     if (previous_node == NULL) {        // Node to be deleted is the head
-//         VL->head = node_to_delete->next;;
-//     } else {                            // Node to be deleted is NOT the head
-//         previous_node->next = node_to_delete->next;
-//     }
-//     free(node_to_delete);
-
-//     (VL->count)--;
-// }
+    if (found_node->VL.head == NULL) {  // VL is empty therefore we can delete this PostCodeNode
+        if (previous_node == NULL) {
+            PCL->head = found_node->next;
+        } else {
+            previous_node->next = found_node->next;
+        }
+        pcl_free_node(found_node);
+        (PCL->count)--;
+    }
+}
 
 
 void pcl_print_voted_per_postcode(PostCodeList PCL) {

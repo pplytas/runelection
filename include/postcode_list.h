@@ -21,6 +21,7 @@ void pcl_init(PostCodeList *);
 PostCodeNode* create_postcode_node(int);
 PostCodeNode* pcl_find_node_by_postcode(PostCodeList, int);
 void pcl_insert(PostCodeList *, RedBlackNode *);
+void pcl_remove(PostCodeList *, int, char *);
 void pcl_print_voted_per_postcode(PostCodeList);
 void pcl_print_node(PostCodeNode *);
 void pcl_print(PostCodeList);

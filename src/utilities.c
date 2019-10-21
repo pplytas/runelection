@@ -28,30 +28,6 @@ void get_command_line_arguments(int argc, char *argv[], char *arguments[3]) {
 }
 
 
-int get_optimal_bf_size(int number) {
-    int i, flag = 1;
-    int min_prime;
-
-    while(flag == 1) {
-        flag = 0;
-        for(i = 2; i < (number / 2); i++) {
-            if(number % i == 0) {
-                flag = 1;
-                break;
-            }
-        }
-
-        if (flag == 0) {
-            min_prime = number;
-        }
-
-        number++;
-    }
-
-    return min_prime;
-}
-
-
 int get_lines_count(FILE *fp) {
     int lines_count = 0;
     char *line = NULL;

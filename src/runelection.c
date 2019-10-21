@@ -11,7 +11,6 @@ int main(int argc, char *argv[]) {
     char *inputfile, *outfile;
     int numofupdates;
 
-    int bf_size;
     BloomFilter BF;
     RedBlackTree RBT;
     PostCodeList PCL;
@@ -23,7 +22,11 @@ int main(int argc, char *argv[]) {
     get_command_line_arguments(argc, argv, cl_arguments);
     inputfile = cl_arguments[0];
     outfile = cl_arguments[1];
-    numofupdates = atoi(cl_arguments[2]);
+    if (cl_arguments[2] != NULL) {
+        numofupdates = atoi(cl_arguments[2]);
+    } else {
+        numofupdates = 5;       // Default value
+    }
 
     // Init data structures
     rbt_init(&RBT);
@@ -34,25 +37,24 @@ int main(int argc, char *argv[]) {
         check_errors(infile, "fopen", 1);
 
         lines_count = get_lines_count(infile);          // Get number of records in inputfile
-        bf_size = get_optimal_bf_size(lines_count * 3);
-        bloom_init(&BF, bf_size);                       // Init BF
+        bloom_init(&BF, lines_count, numofupdates);                       // Init BF
 
         insert_records(&BF, &RBT, &PCL, infile);        // Insert records to data structures
 
         fclose(infile);
     } else {
-        bloom_init(&BF, 307);
+        bloom_init(&BF, 307, numofupdates);
     }
 
     // Print data structures
     // bloom_print(BF);
     // pcl_print(PCL);
-    // rbt_print(RBT);
+    rbt_print(RBT);
 
     listen_for_commands(&BF, &RBT, &PCL);       // Listen for user input
 
     if (outfile != NULL) {
-        write_new_registry(RBT, outfile);                   // Store new registry in outfile
+        write_new_registry(RBT, outfile);               // Store new registry in outfile
     }
 
     // Free allocated memory of data structures

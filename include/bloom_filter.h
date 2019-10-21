@@ -2,19 +2,23 @@
 #define BLOOM_FILTER_H
 
 typedef struct BloomFilter {
+    unsigned char *bf;
     int count;
     int bits;
     int bytes;
-    unsigned char *bf;
+    int updates_count;
+    int max_updates_count;
 } BloomFilter;
 
-void bloom_init(BloomFilter *, int);
+int bf_calculate_bits(int);
+void bloom_init(BloomFilter *, int, int);
+void bloom_reinit(BloomFilter *, int);
+int bloom_increase_updates_count_and_check(BloomFilter *);
 int test_bit(unsigned char *, unsigned int);
 int set_bit(unsigned char *, unsigned int);
 int bloom_check(BloomFilter, char *);
-int bloom_add(BloomFilter *, char *);
+void bloom_add(BloomFilter *, char *);
 void bloom_print(BloomFilter);
-int bloom_reset(BloomFilter *);
 void bloom_free(BloomFilter);
 
 #endif

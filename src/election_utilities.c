@@ -7,8 +7,30 @@
 #include "stack.h"
 
 
-int insert_key(BloomFilter *BF, RedBlackTree *RBT, PostCodeList *PCL, char *record_info[6]) {
+void refill_bf(BloomFilter *BF, RedBlackTree RBT) {
+    Stack S;
+    RedBlackNode *rbt_node;
+
+    stack_init(&S);
+    stack_push(&S, RBT.root);
+    while (!stack_is_empty(S)) {
+        rbt_node = stack_pop(&S);
+
+        if (rbt_node->right != NULL) {
+            stack_push(&S, rbt_node->right);
+        }
+        if (rbt_node->left != NULL) {
+            stack_push(&S, rbt_node->left);
+        }
+
+        bloom_add(BF, rbt_node->key);
+    }
+}
+
+
+int insert_key(BloomFilter *BF, RedBlackTree *RBT, PostCodeList *PCL, char *record_info[6], int insert_from_file) {
     RedBlackNode *new_node;
+    int needs_rebuild;
 
     char *key = record_info[0];
     char *lastname = record_info[1];
@@ -17,23 +39,24 @@ int insert_key(BloomFilter *BF, RedBlackTree *RBT, PostCodeList *PCL, char *reco
     char gender = record_info[4][0];
     int postcode = atoi(record_info[5]);
 
-    // printf("Key: %s\n", key);
-    // printf("Lastname: %s\n", lastname);
-    // printf("Firstname: %s\n", firstname);
-    // printf("Age: %d\n", age);
-    // printf("Gender: %c\n", gender);
-    // printf("Postcode: %d\n", postcode);
-    // printf("\n");
-
     bloom_add(BF, key);
-
     new_node = rbt_insert(RBT, key, lastname, firstname, age, gender, postcode);
-    if (new_node == NULL) {
-        return 0;       // key already exists
+    if (new_node == NULL) return 0;  // key already exists
+
+    if (!insert_from_file) {    // If the records are inserted from the input file then BF already has the appropriate size, no need to rebuild
+        needs_rebuild = bloom_increase_updates_count_and_check(BF);
+        if (needs_rebuild) {
+            bloom_print(*BF);
+            printf("%d\n", RBT->count);
+            bloom_reinit(BF, RBT->count);
+            bloom_print(*BF);
+            refill_bf(BF, *RBT);
+            bloom_print(*BF);
+        }
     }
 
     pcl_insert(PCL, new_node);
-    return 1;           // key inserted successfully
+    return 1;  // key inserted successfully
 }
 
 
@@ -51,7 +74,7 @@ void insert_records(BloomFilter *BF, RedBlackTree *RBT, PostCodeList *PCL, FILE 
 
         response = get_record_info(line, record_info);
         if (response) {
-            response = insert_key(BF, RBT, PCL, record_info);
+            response = insert_key(BF, RBT, PCL, record_info, 1);
             if (response) {
                 printf("# REC-WITH %s INSERTED-IN-BF-RBT\n", record_info[0]);
             } else {
@@ -133,6 +156,40 @@ void load_fileofkeys(BloomFilter BF, RedBlackTree *RBT, PostCodeList PCL, char *
 }
 
 
+int delete_key(BloomFilter *BF, RedBlackTree *RBT, PostCodeList *PCL, char *key) {
+    int needs_rebuild;
+    RedBlackNode *found_node = rbt_find_node_by_key(*RBT, key);
+
+    if (found_node == NULL) return 0;   // key not found
+
+    printf("1\n");
+    fflush(stdout);
+
+    // pcl_remove(PCL, found_node->postcode, found_node->key);
+
+    printf("2\n");
+    fflush(stdout);
+
+    rbt_delete_node(RBT, found_node);
+    rbt_print(*RBT);
+
+    printf("3\n");
+    fflush(stdout);
+
+    needs_rebuild = bloom_increase_updates_count_and_check(BF);
+    if (needs_rebuild) {
+        bloom_print(*BF);
+        printf("%d\n", RBT->count);
+        bloom_reinit(BF, RBT->count);
+        bloom_print(*BF);
+        refill_bf(BF, *RBT);
+        bloom_print(*BF);
+    }
+
+    return 1;   // key deleted successfully
+}
+
+
 void listen_for_commands(BloomFilter *BF, RedBlackTree *RBT, PostCodeList *PCL){
     size_t len = 0;
     ssize_t nread;
@@ -176,7 +233,7 @@ void listen_for_commands(BloomFilter *BF, RedBlackTree *RBT, PostCodeList *PCL){
                 token = strtok(NULL, " \t");
                 response = get_record_info_from_tokenized_string(token, record_info);
                 if (response) {
-                    response = insert_key(BF, RBT, PCL, record_info);
+                    response = insert_key(BF, RBT, PCL, record_info, 0);
                     if (response) {
                         printf("# REC-WITH %s INSERTED-IN-BF-RBT\n", record_info[0]);
                     } else {
@@ -197,9 +254,16 @@ void listen_for_commands(BloomFilter *BF, RedBlackTree *RBT, PostCodeList *PCL){
                     }
                 }
             }
-            else if(strcmp(token, "delete key") == 0) {
+            else if(strcmp(token, "delete") == 0) {
                 token = strtok(NULL, " \t");
-                printf("%s\n", token);
+                if (token != NULL) {
+                    response = delete_key(BF, RBT, PCL, token);
+                    if (response) {
+                        printf("# DELETED %s FROM-structs\n", token);
+                    } else {
+                        printf("- KEY %s NOT-in-structs\n", token);
+                    }
+                }
             }
             else if(strcmp(token, "vote") == 0) {
                 token = strtok(NULL, " \t");
@@ -261,7 +325,10 @@ void write_new_registry(RedBlackTree RBT, char *filepath) {
     if (fp == NULL) return;
 
     stack_init(&S);
-    stack_push(&S, RBT.root);
+
+    if (RBT.root != NULL) {
+        stack_push(&S, RBT.root);
+    }
     while (!stack_is_empty(S)) {
         rbt_node = stack_pop(&S);
 

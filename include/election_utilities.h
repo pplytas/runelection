@@ -6,11 +6,13 @@
 #include "postcode_list.h"
 
 
-int insert_key(BloomFilter *, RedBlackTree *, PostCodeList *, char *[6]);
+void refill_bf(BloomFilter *BF, RedBlackTree RBT);
+int insert_key(BloomFilter *, RedBlackTree *, PostCodeList *, char *[6], int);
 void insert_records(BloomFilter *, RedBlackTree *, PostCodeList *, FILE *);
 RedBlackNode* find_key(BloomFilter, RedBlackTree, char *);
 int vote_key(BloomFilter, RedBlackTree *, PostCodeList, char *);
 void load_fileofkeys(BloomFilter, RedBlackTree *, PostCodeList, char *);
+int delete_key(BloomFilter *, RedBlackTree *, PostCodeList *, char *);
 void listen_for_commands(BloomFilter *, RedBlackTree *, PostCodeList *);
 void write_new_registry(RedBlackTree, char *);
 

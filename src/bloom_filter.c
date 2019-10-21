@@ -8,11 +8,33 @@
 #include "utilities.h"
 
 
-void bloom_init(BloomFilter *BF, int bits) {
-    BF->count = 0;
-    BF->bits = bits;
+int bf_calculate_bits(int number) {
+    int i, flag = 1;
+    int min_prime;
 
-    if (BF->bits % 8) {
+    while(flag == 1) {
+        flag = 0;
+        for(i = 2; i < (number / 2); i++) {
+            if(number % i == 0) {
+                flag = 1;
+                break;
+            }
+        }
+
+        if (flag == 0) {
+            min_prime = number;
+        }
+
+        number++;
+    }
+
+    return min_prime;
+}
+
+
+void bloom_init(BloomFilter *BF, int records_count, int max_updates_count) {
+    BF->bits = bf_calculate_bits(records_count * 3);
+    if ((BF->bits % 8) > 0) {
         BF->bytes = (BF->bits / 8) + 1;
     } else {
         BF->bytes = BF->bits / 8;
@@ -20,6 +42,23 @@ void bloom_init(BloomFilter *BF, int bits) {
 
     BF->bf = (unsigned char *) calloc(BF->bytes, sizeof(unsigned char));
     check_errors(BF->bf, "malloc", 1);
+
+    BF->max_updates_count = max_updates_count;
+    BF->count = 0;
+    BF->updates_count = 0;
+}
+
+
+void bloom_reinit(BloomFilter *BF, int new_records_count) {
+    int max_updates_count = BF->max_updates_count;
+    bloom_free(*BF);
+    bloom_init(BF, new_records_count, max_updates_count);
+}
+
+
+int bloom_increase_updates_count_and_check(BloomFilter *BF) {
+    (BF->updates_count)++;
+    return BF->updates_count >= BF->max_updates_count;
 }
 
 
@@ -65,7 +104,7 @@ int bloom_check(BloomFilter BF, char *string) {
 }
 
 
-int bloom_add(BloomFilter *BF, char *string) {
+void bloom_add(BloomFilter *BF, char *string) {
     int hits = 0;
     int length = strlen(string);
     unsigned int a = murmurhash2(string, length, 0x9747b28c);
@@ -79,25 +118,16 @@ int bloom_add(BloomFilter *BF, char *string) {
         }
     }
     (BF->count)++;
-
-    if (hits == 3) {
-        return 1;
-    }
-
-    return 0;
 }
+
 
 void bloom_print(BloomFilter BF) {
     printf("Bloom Filter\n");
     printf("\tCount = %d\n", BF.count);
+    printf("\tUpdates Count = %d\n", BF.updates_count);
+    printf("\tMax Updates Count = %d\n", BF.max_updates_count);
     printf("\tBits = %d\n", BF.bits);
     printf("\tBytes = %d\n\n", BF.bytes);
-}
-
-
-int bloom_reset(BloomFilter *BF) {
-    memset(BF->bf, 0, BF->bytes);
-    return 0;
 }
 
 

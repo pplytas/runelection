@@ -63,14 +63,17 @@ void vl_remove(VoterList *VL, char *key) {
         node_to_delete = node_to_delete->next;
     }
 
+    if (node_to_delete->voter->has_voted == 1) {
+        (VL->have_voted_count)--;
+    }
+    (VL->voters_count)--;
+
     if (previous_node == NULL) {        // Node to be deleted is the head
         VL->head = node_to_delete->next;;
     } else {                            // Node to be deleted is NOT the head
         previous_node->next = node_to_delete->next;
     }
     free(node_to_delete);
-
-    (VL->voters_count)--;
 }
 
 
