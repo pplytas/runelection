@@ -1,5 +1,5 @@
 *.o
 *.sh
 src/runelection
-src/test*
+test*
 .DS_Store

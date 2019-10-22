@@ -26,4 +26,5 @@ $(ODIR):
 .PHONY: clean
 
 clean:
-	rm -f $(ODIR)/*.o
+	rm -rf $(ODIR)/
+	rm -f runelection
