@@ -48,12 +48,8 @@ int insert_key(BloomFilter *BF, RedBlackTree *RBT, PostCodeList *PCL, char *reco
     if (!insert_from_file) {    // If the records are inserted from the input file then BF already has the appropriate size, no need to rebuild
         needs_rebuild = bloom_increase_updates_count_and_check(BF);
         if (needs_rebuild) {
-            bloom_print(*BF);
-            printf("%d\n", RBT->count);
             bloom_reinit(BF, RBT->count);
-            bloom_print(*BF);
             refill_bf(BF, *RBT);
-            bloom_print(*BF);
         }
     }
 
@@ -167,16 +163,11 @@ int delete_key(BloomFilter *BF, RedBlackTree *RBT, PostCodeList *PCL, char *key)
     pcl_remove(PCL, found_node->postcode, found_node->key);
 
     rbt_delete_node(RBT, found_node);
-    rbt_print(*RBT);
 
     needs_rebuild = bloom_increase_updates_count_and_check(BF);
     if (needs_rebuild) {
-        bloom_print(*BF);
-        printf("%d\n", RBT->count);
         bloom_reinit(BF, RBT->count);
-        bloom_print(*BF);
         refill_bf(BF, *RBT);
-        bloom_print(*BF);
     }
 
     return 1;   // key deleted successfully

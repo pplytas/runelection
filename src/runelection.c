@@ -46,11 +46,6 @@ int main(int argc, char *argv[]) {
         bloom_init(&BF, 307, numofupdates);
     }
 
-    // Print data structures
-    // bloom_print(BF);
-    // pcl_print(PCL);
-    rbt_print(RBT);
-
     listen_for_commands(&BF, &RBT, &PCL);       // Listen for user input
 
     if (outfile != NULL) {

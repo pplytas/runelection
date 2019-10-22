@@ -319,10 +319,7 @@ char get_color(RedBlackNode *node) {
 void rbt_delete_fix(RedBlackTree *RBT, RedBlackNode *node, RedBlackNode *parent_node) {
     if (node == RBT->root) return;
 
-    printf("parent_node 1: %s\n", parent_node->key);
-
     RedBlackNode *sibling_node = (node == parent_node->left) ? parent_node->right : parent_node->left;
-    printf("sibling_node 2 key: %s %c\n", sibling_node->key, sibling_node->color);
 
     if (sibling_node == NULL) {
         rbt_delete_fix(RBT, parent_node, parent_node->parent);
@@ -348,8 +345,6 @@ void rbt_delete_fix(RedBlackTree *RBT, RedBlackNode *node, RedBlackNode *parent_
                 }
                 parent_node->color = BLACK;
             } else {     // both children are black
-                printf("sibling_node 2 key: %s\n", sibling_node->key);
-                printf("parent key 2: %s\n", parent_node->key);
                 sibling_node->color = RED;
                 if (parent_node->color == BLACK) {
                     rbt_delete_fix(RBT, parent_node, parent_node->parent);
@@ -366,8 +361,6 @@ void rbt_delete_fix(RedBlackTree *RBT, RedBlackNode *node, RedBlackNode *parent_
                 rbt_rotate_left(RBT, parent_node);
             }
             rbt_print(*RBT);
-            printf("333333\n");
-            printf("Parent key: %s\n", parent_node->key);
             rbt_delete_fix(RBT, node, parent_node);
         }
     }
