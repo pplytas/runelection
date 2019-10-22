@@ -360,7 +360,6 @@ void rbt_delete_fix(RedBlackTree *RBT, RedBlackNode *node, RedBlackNode *parent_
             } else {
                 rbt_rotate_left(RBT, parent_node);
             }
-            rbt_print(*RBT);
             rbt_delete_fix(RBT, node, parent_node);
         }
     }
