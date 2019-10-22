@@ -17,7 +17,7 @@ void rbt_init(RedBlackTree *RBT) {
 }
 
 
-RedBlackNode* create_red_black_node(char *key, char *firstname, char *lastname, int age, char gender, int postcode) {
+RedBlackNode* create_red_black_node(char *key, char *firstname, char *lastname, int age, char gender, int postcode, int has_voted) {
     RedBlackNode *new_node = (RedBlackNode*) malloc(sizeof(RedBlackNode));
     check_errors(new_node, "malloc", 1);
 
@@ -36,7 +36,7 @@ RedBlackNode* create_red_black_node(char *key, char *firstname, char *lastname, 
     new_node->age = age;
     new_node->gender = gender;
     new_node->postcode = postcode;
-    new_node->has_voted = 0;
+    new_node->has_voted = has_voted;
 
     new_node->color = RED;
     new_node->left = NULL;
@@ -174,7 +174,7 @@ RedBlackNode* rbt_insert(RedBlackTree *RBT, char *key, char *lastname, char *fir
         }
     }
 
-    new_node = create_red_black_node(key, firstname, lastname, age, gender, postcode);
+    new_node = create_red_black_node(key, firstname, lastname, age, gender, postcode, 0);
     rbt_insert_child_node(RBT, parent_node, new_node);
     (RBT->count)++;
 
@@ -236,6 +236,29 @@ void rbt_copy_node(RedBlackNode *src_node, RedBlackNode *dest_node) {
 }
 
 
+void rbt_transplant_node(RedBlackTree *RBT, RedBlackNode *new_node, RedBlackNode *old_node) {
+    new_node->color = old_node->color;
+    new_node->parent = old_node->parent;
+    if (old_node->parent != NULL) {
+        if (is_left_child(old_node)) {
+            old_node->parent->left = new_node;
+        } else {
+            old_node->parent->right = new_node;
+        }
+    } else {
+        RBT->root = new_node;
+    }
+    new_node->left = old_node->left;
+    if (old_node->left != NULL) {
+        old_node->left->parent = new_node;
+    }
+    new_node->right = old_node->right;
+    if (old_node->right != NULL) {
+        old_node->right->parent = new_node;
+    }
+}
+
+
 void rbt_delete_node(RedBlackTree *RBT, RedBlackNode *node_to_delete){
     RedBlackNode *successor_node, *child_node, *parent_node_to_delete;
 
@@ -244,7 +267,14 @@ void rbt_delete_node(RedBlackTree *RBT, RedBlackNode *node_to_delete){
 
     if (node_to_delete->left != NULL && node_to_delete->right != NULL) {
         successor_node = rbt_find_min_node(node_to_delete->right);
-        rbt_copy_node(successor_node, node_to_delete);
+
+        RedBlackNode *successor_node_copy = create_red_black_node(successor_node->key, successor_node->firstname, successor_node->lastname, successor_node->age, successor_node->gender, successor_node->postcode, successor_node->has_voted);
+        rbt_transplant_node(RBT, successor_node_copy, successor_node);
+        rbt_transplant_node(RBT, successor_node, node_to_delete);
+        rbt_free_node(node_to_delete);
+        node_to_delete = successor_node;
+        successor_node = successor_node_copy;
+
         node_to_delete = successor_node;    // Node to delete now becomes the successor which is either leaf or has one child
     }
 

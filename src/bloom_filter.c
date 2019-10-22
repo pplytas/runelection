@@ -12,6 +12,8 @@ int bf_calculate_bits(int number) {
     int i, flag = 1;
     int min_prime;
 
+    number = (number > 0) ? number * 3 : 3;
+
     while(flag == 1) {
         flag = 0;
         for(i = 2; i < (number / 2); i++) {
@@ -33,7 +35,7 @@ int bf_calculate_bits(int number) {
 
 
 void bloom_init(BloomFilter *BF, int records_count, int max_updates_count) {
-    BF->bits = bf_calculate_bits(records_count * 3);
+    BF->bits = bf_calculate_bits(records_count);
     if ((BF->bits % 8) > 0) {
         BF->bytes = (BF->bits / 8) + 1;
     } else {

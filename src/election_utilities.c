@@ -12,7 +12,9 @@ void refill_bf(BloomFilter *BF, RedBlackTree RBT) {
     RedBlackNode *rbt_node;
 
     stack_init(&S);
-    stack_push(&S, RBT.root);
+    if (RBT.root != NULL) {
+        stack_push(&S, RBT.root);
+    }
     while (!stack_is_empty(S)) {
         rbt_node = stack_pop(&S);
 
@@ -162,19 +164,10 @@ int delete_key(BloomFilter *BF, RedBlackTree *RBT, PostCodeList *PCL, char *key)
 
     if (found_node == NULL) return 0;   // key not found
 
-    printf("1\n");
-    fflush(stdout);
-
-    // pcl_remove(PCL, found_node->postcode, found_node->key);
-
-    printf("2\n");
-    fflush(stdout);
+    pcl_remove(PCL, found_node->postcode, found_node->key);
 
     rbt_delete_node(RBT, found_node);
     rbt_print(*RBT);
-
-    printf("3\n");
-    fflush(stdout);
 
     needs_rebuild = bloom_increase_updates_count_and_check(BF);
     if (needs_rebuild) {

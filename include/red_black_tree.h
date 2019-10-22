@@ -25,7 +25,7 @@ typedef struct RedBlackTree {
 } RedBlackTree;
 
 void rbt_init(RedBlackTree *);
-RedBlackNode* create_red_black_node(char *, char *, char *, int, char, int);
+RedBlackNode* create_red_black_node(char *, char *, char *, int, char, int, int);
 void rbt_rotate_left(RedBlackTree *, RedBlackNode *);
 void rbt_rotate_right(RedBlackTree *, RedBlackNode *);
 void rbt_insert_fix(RedBlackTree *, RedBlackNode *);
@@ -35,6 +35,7 @@ RedBlackNode* rbt_insert(RedBlackTree *, char *, char *, char *, int, char, int)
 int rbt_update_node_has_voted(RedBlackNode *, int);
 int rbt_update_has_voted(RedBlackTree *, RedBlackNode *, int);
 void rbt_copy_node(RedBlackNode *, RedBlackNode *);
+void rbt_transplant_node(RedBlackTree *, RedBlackNode *, RedBlackNode *);
 void rbt_delete_node(RedBlackTree *, RedBlackNode *);
 int is_left_child(RedBlackNode *);
 int is_right_child(RedBlackNode *);
