@@ -2,3 +2,4 @@
 *.sh
 src/runelection
 src/test*
+.DS_Store
